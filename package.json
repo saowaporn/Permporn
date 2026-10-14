@@ -1,0 +1,13 @@
+{
+  "name": "permporn-accessories-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bilingual jewelry website with a Vercel email inquiry endpoint",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "node scripts/build-production.cjs",
+    "start": "node server/local.cjs",
+    "test": "node tests/inquiry.test.cjs"
+  },
+  "dependencies": { "nodemailer": "^10.1.1" }
+}

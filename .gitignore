@@ -1,0 +1,9 @@
+dist/
+output/
+__pycache__/
+node_modules/
+.cache/
+.env
+.env.*
+!.env.example
+.vercel/

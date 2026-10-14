@@ -1,8 +1,189 @@
-const translations={
-  th:{nav_services:'บริการ',nav_process:'ขั้นตอน',nav_about:'เกี่ยวกับเรา',nav_contact:'พูดคุยกับเรา',hero_title:'ให้เครื่องประดับที่คุณตามหา <em>เป็นเรื่องที่ง่ายขึ้น</em>',hero_copy:'เรารับฟังความต้องการ ค้นหา และเปรียบเทียบตัวเลือกจากซัพพลายเออร์ เพื่อให้คุณตัดสินใจได้อย่างมั่นใจก่อนยืนยันคำสั่งซื้อ',hero_cta:'ปรึกษาความต้องการ',hero_process:'ดูขั้นตอนการทำงาน',about_title:'เพราะการเลือกเครื่องประดับที่ใช่ควรเริ่มจากความต้องการของคุณ',about_p1:'Permporn Accessories เป็นผู้ให้บริการอิสระด้านการค้นหาและประสานงานสำหรับเพชร พลอย และเครื่องประดับ',about_p2:'เราช่วยเก็บรายละเอียดที่คุณต้องการ ค้นหาและเปรียบเทียบตัวเลือกที่เหมาะสม พร้อมประสานงานกับซัพพลายเออร์หรือผู้ผลิตก่อนที่คุณจะยืนยันคำสั่งซื้อ',services_title:'บริการของเรา',services_intro:'ตั้งแต่หินเม็ดแรก ไปจนถึงชิ้นงานที่ออกแบบเพื่อคุณ',service_1:'ค้นหาเพชรธรรมชาติและเพชร Lab-Grown ตามงบประมาณและคุณสมบัติที่ต้องการ',service_2:'จัดหาพลอยหลากหลายชนิด พร้อมข้อมูลผลิตภัณฑ์ที่ได้รับอนุมัติจากซัพพลายเออร์',service_3:'ค้นหาชิ้นงานสำเร็จรูปหรือประสานงานคำสั่งทำเครื่องประดับเฉพาะแบบ',service_4:'ช่วยเปรียบเทียบตัวเลือกและให้คำปรึกษา เพื่อให้ตัดสินใจได้เหมาะกับคุณที่สุด',process_title:'จากความต้องการสู่ชิ้นงานของคุณ',process_intro:'ทุกขั้นตอนชัดเจน ตรวจสอบข้อมูล ความพร้อม และราคาปัจจุบันก่อนนำเสนอ',step_1_title:'รับความต้องการ',step_1_copy:'คุยเรื่องประเภทสินค้า งบประมาณ รูปแบบ และกำหนดเวลา',step_2_title:'ค้นหาและคัดเลือก',step_2_copy:'ประสานงานกับซัพพลายเออร์หรือผู้ผลิตที่เหมาะสม',step_3_title:'เปรียบเทียบตัวเลือก',step_3_copy:'นำเสนอข้อมูล รูปภาพ วิดีโอ และตัวเลือกเพื่อประกอบการตัดสินใจ',step_4_title:'ยืนยันจากลูกค้า',step_4_copy:'ตรวจสอบรายละเอียด ความพร้อม และราคาปัจจุบันร่วมกัน',step_5_title:'สั่งซื้อและประสานงาน',step_5_copy:'ดำเนินการกับพาร์ตเนอร์และติดตามจนจบกระบวนการ',partner_title:'เติบโตไปด้วยกันอย่างโปร่งใส',partner_copy:'เราเปิดรับรูปแบบ Dealer Price, Agent, Referral, Commission และ Order-Based Sourcing โดยเริ่มจากสินค้าที่คัดเลือก เพื่อไม่ต้องถือสต็อก',partner_note:'ใช้เฉพาะภาพ วิดีโอ และข้อมูลที่ได้รับอนุมัติจากซัพพลายเออร์ พร้อมยืนยันสินค้าและราคาก่อนนำเสนอลูกค้าเสมอ',offer_1:'ให้คำปรึกษาลูกค้าภาษาไทย',offer_2:'เก็บความต้องการลูกค้าอย่างเป็นระบบ',offer_3:'นำเสนอเฉพาะผลิตภัณฑ์ที่ได้รับอนุมัติ',offer_4:'ประสานงานและติดตามข้อซักถาม',offer_5:'ช่วยเข้าถึงลูกค้าใหม่ผ่าน Permporn Accessories',contact_title:'กำลังมองหาเพชร พลอย หรือเครื่องประดับแบบไหนอยู่?',contact_copy:'ส่งรายละเอียดคร่าว ๆ มาให้เรา แล้วเราจะช่วยดูตัวเลือกที่เหมาะกับคุณ',contact_whatsapp:'คุยผ่าน WhatsApp',contact_phone:'โทร 083 687 0818'},
-  en:{}
-};
-const english={};document.querySelectorAll('[data-i18n]').forEach(el=>english[el.dataset.i18n]=el.textContent);document.querySelectorAll('[data-i18n-html]').forEach(el=>english[el.dataset.i18nHtml]=el.innerHTML);translations.en=english;
-const menuButton=document.querySelector('.menu-button'),nav=document.querySelector('.nav'),languageButton=document.querySelector('.language-toggle');
-function applyLanguage(lang){const copy=translations[lang];document.documentElement.lang=lang;document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=copy[el.dataset.i18n]);document.querySelectorAll('[data-i18n-html]').forEach(el=>el.innerHTML=copy[el.dataset.i18nHtml]);languageButton.textContent=lang==='en'?'TH':'EN';languageButton.setAttribute('aria-label',lang==='en'?'เปลี่ยนเป็นภาษาไทย':'Switch to English');menuButton.setAttribute('aria-label',lang==='en'?'Open menu':'เปิดเมนู');document.querySelector('.brand').setAttribute('aria-label',lang==='en'?'Permporn Accessories home':'หน้าหลัก Permporn Accessories');document.querySelector('.hero-image').alt=lang==='en'?'Diamond, colored gemstones and a gold ring on black stone':'เพชร พลอยสี และแหวนทองบนพื้นหินสีดำ';document.querySelector('meta[name="description"]').content=lang==='en'?'Independent diamond, gemstone and jewelry sourcing, product comparison and order coordination.':'บริการจัดหาเพชร พลอย และเครื่องประดับ พร้อมช่วยเปรียบเทียบตัวเลือกและประสานงานคำสั่งซื้อ';localStorage.setItem('permporn-language',lang)}
-menuButton.addEventListener('click',()=>{const open=nav.classList.toggle('open');menuButton.setAttribute('aria-expanded',open);menuButton.setAttribute('aria-label',open?(document.documentElement.lang==='en'?'Close menu':'ปิดเมนู'):(document.documentElement.lang==='en'?'Open menu':'เปิดเมนู'))});nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{nav.classList.remove('open');menuButton.setAttribute('aria-expanded','false')}));languageButton.addEventListener('click',()=>applyLanguage(document.documentElement.lang==='en'?'th':'en'));document.querySelector('#year').textContent=new Date().getFullYear();applyLanguage(localStorage.getItem('permporn-language')||'en');
+﻿(() => {
+  'use strict';
+  const root = document.documentElement;
+  const lang = () => root.dataset.language || 'th';
+  const text = (th, en) => lang() === 'th' ? th : en;
+  const $ = selector => document.querySelector(selector);
+  const $$ = selector => [...document.querySelectorAll(selector)];
+  function applyLanguage(language) {
+    root.lang = language; root.dataset.language = language;
+    const key = language === 'th' ? 'Th' : 'En';
+    document.title = document.body.dataset['title'+key];
+    const description = document.body.dataset['description'+key];
+    $('meta[name="description"]').content = description;
+    $('meta[property="og:title"]').content = document.title;
+    $('meta[property="og:description"]').content = description;
+    $$('button[data-language]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.language === language)));
+    $$('[data-text-th]').forEach(el => { el.textContent = el.dataset['text'+key]; });
+    $$('[data-alt-th]').forEach(el => { el.alt = el.dataset['alt'+key]; });
+    $$('[data-placeholder-th]').forEach(el => { el.placeholder = el.dataset['placeholder'+key]; });
+    $$('[data-label-th]').forEach(el => { el.setAttribute('aria-label',el.dataset['label'+key]); });
+    document.dispatchEvent(new CustomEvent('languagechange'));
+  }
+  $$('button[data-language]').forEach(b => b.addEventListener('click', () => {
+    try { localStorage.setItem('permporn-language', b.dataset.language); } catch (_) {}
+    applyLanguage(b.dataset.language);
+  }));
+  const announcement = $('.topline-slider');
+  if (announcement) {
+    const track = announcement.querySelector('.topline-track');
+    const messages = [...track.querySelectorAll('.topline-message:not(.topline-clone)')];
+    const pauseButton = $('.topline-pause');
+    const topbar = announcement.closest('.topline');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion:reduce)');
+    let index = 0;
+    let paused = reducedMotion.matches;
+    let hovered = false;
+    let focused = false;
+    let timer;
+    const updatePause = () => {
+      pauseButton.classList.toggle('is-paused',paused);
+      pauseButton.setAttribute('aria-pressed',String(paused));
+      pauseButton.dataset.labelTh = paused ? 'เล่นข้อความอัตโนมัติ' : 'หยุดข้อความชั่วคราว';
+      pauseButton.dataset.labelEn = paused ? 'Play announcements' : 'Pause announcements';
+      pauseButton.setAttribute('aria-label',text(pauseButton.dataset.labelTh,pauseButton.dataset.labelEn));
+      pauseButton.title = pauseButton.getAttribute('aria-label');
+    };
+    const resetLoop = () => {
+      if (index !== messages.length) return;
+      track.classList.add('is-resetting');
+      index = 0;
+      track.style.setProperty('--announcement-index',0);
+      void track.offsetHeight;
+      track.classList.remove('is-resetting');
+    };
+    const advance = () => {
+      if (paused || hovered || focused || document.hidden) return;
+      resetLoop();
+      index += 1;
+      if (reducedMotion.matches && index === messages.length) index = 0;
+      const active = index % messages.length;
+      messages.forEach((message,i) => {
+        message.inert = i !== active;
+        message.setAttribute('aria-hidden',String(i !== active));
+        message.querySelectorAll('a').forEach(a => a.tabIndex = i === active ? 0 : -1);
+      });
+      track.style.setProperty('--announcement-index',index);
+    };
+    track.addEventListener('transitionend',e => {
+      if (e.target === track && e.propertyName === 'transform') resetLoop();
+    });
+    pauseButton.addEventListener('click',() => {
+      paused=!paused;
+      if (!paused) focused=false;
+      updatePause();
+    });
+    topbar.addEventListener('mouseenter',() => hovered=true);
+    topbar.addEventListener('mouseleave',() => hovered=false);
+    topbar.addEventListener('focusin',() => focused=true);
+    topbar.addEventListener('focusout',e => focused=topbar.contains(e.relatedTarget));
+    reducedMotion.addEventListener('change',e => {
+      if (e.matches) {paused=true;resetLoop();updatePause();}
+    });
+    document.addEventListener('languagechange',updatePause);
+    const start = () => {clearInterval(timer);timer=setInterval(advance,4000);};
+    window.addEventListener('pagehide',() => clearInterval(timer));
+    window.addEventListener('pageshow',start);
+    pauseButton.hidden=false;
+    updatePause();
+    start();
+  }
+  const menu = $('.menu-button'); const nav = $('#main-nav');
+  function closeMenu() {
+    nav.classList.remove('is-open');
+    menu.setAttribute('aria-expanded','false');
+    $$('.nav-dropdown[open]').forEach(d => d.open=false);
+  }
+  menu.addEventListener('click', () => {
+    const open = nav.classList.toggle('is-open');
+    menu.setAttribute('aria-expanded',String(open));
+    if (!open) closeMenu();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const openDropdown = $('.nav-dropdown[open]');
+    if (nav.classList.contains('is-open')) menu.focus();
+    else if (openDropdown && openDropdown.contains(document.activeElement)) openDropdown.querySelector('summary').focus();
+    closeMenu();
+  });
+  $$('.nav-dropdown').forEach(d => d.addEventListener('focusout', e => {
+    if (e.relatedTarget && !d.contains(e.relatedTarget)) d.open=false;
+  }));
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.site-header')) closeMenu();
+    $$('.nav-dropdown[open]').forEach(d => {if (!d.contains(e.target)) d.open=false;});
+  });
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click',()=>{
+    // Let the link navigate before collapsing the dropdown that contains it.
+    setTimeout(closeMenu,0);
+  }));
+  window.matchMedia('(min-width:1081px)').addEventListener('change', closeMenu);
+  const contactToggle = $('#contact-toggle');
+  const contactOptions = $('#contact-options');
+  if (contactToggle && contactOptions) {
+    contactToggle.setAttribute('role','button');
+    const closeContact = (restoreFocus=false) => {
+      contactOptions.hidden=true;
+      contactToggle.setAttribute('aria-expanded','false');
+      if(restoreFocus)contactToggle.focus();
+    };
+    contactToggle.addEventListener('click',e => {
+      e.preventDefault();
+      const open=contactOptions.hidden;
+      contactOptions.hidden=!open;
+      contactToggle.setAttribute('aria-expanded',String(open));
+      if(open)contactOptions.querySelector('.contact-option').focus();
+    });
+    contactToggle.addEventListener('keydown',e => {
+      if(e.key===' '){e.preventDefault();contactToggle.click();}
+    });
+    $('.contact-options-close').addEventListener('click',()=>closeContact(true));
+    document.addEventListener('keydown',e => {
+      if(e.key==='Escape'&&!contactOptions.hidden)closeContact(true);
+    });
+    document.addEventListener('click',e => {
+      if(!e.target.closest('.contact-widget'))closeContact();
+    });
+    document.addEventListener('focusin',e => {
+      if(!contactOptions.hidden&&!e.target.closest('.contact-widget'))closeContact();
+    });
+    contactOptions.querySelectorAll('.contact-option').forEach(a=>a.addEventListener('click',()=>setTimeout(()=>closeContact(),0)));
+  }
+  $('#year').textContent = new Date().getFullYear();
+  const shapeLinks = $$('[data-shape]');
+  if (shapeLinks.length) {
+    let shape = ''; const carat = $('#carat');
+    const update = () => {
+      const parts = [shape, carat.value].filter(Boolean);
+      $('#preference-summary').textContent = parts.length ? text('ความต้องการ: ','Preferences: ')+parts.join(' / ') : text('เลือกทรงและน้ำหนัก หรือให้เราช่วยแนะนำได้','Choose a shape and weight, or ask us for guidance.');
+      const query = new URLSearchParams({category:$('#shape-inquiry').dataset.category});
+      if(shape)query.set('shape',shape); if(carat.value)query.set('size',carat.value);
+      $('#shape-inquiry').href='contact.html?'+query+'#inquiry';
+    };
+    shapeLinks.forEach(a => {a.setAttribute('role','button');a.addEventListener('click',e => {e.preventDefault();shape=shape===a.dataset.shape?'':a.dataset.shape;shapeLinks.forEach(l=>l.setAttribute('aria-pressed',String(l.dataset.shape===shape)));update();});a.addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();a.click();}});});
+    carat.addEventListener('change', update); document.addEventListener('languagechange',update);
+  }
+  const tabs = $$('[data-tab]');
+  if(tabs.length) {
+    function selectTab(tab, focus=false) {
+      tabs.forEach(t => {const active=t===tab;t.setAttribute('aria-selected',String(active));t.tabIndex=active?0:-1;$('#panel-'+t.dataset.tab).hidden=!active;});
+      if(focus)tab.focus();
+    }
+    tabs.forEach((tab,index)=>{tab.addEventListener('click',()=>selectTab(tab));tab.addEventListener('keydown',e=>{let next;if(e.key==='ArrowRight')next=(index+1)%tabs.length;if(e.key==='ArrowLeft')next=(index-1+tabs.length)%tabs.length;if(e.key==='Home')next=0;if(e.key==='End')next=tabs.length-1;if(next!==undefined){e.preventDefault();selectTab(tabs[next],true);}});});
+  }
+  const search = $('#faq-search');
+  if(search) {
+    let category = 'all'; const items = $$('.faq-page .faq-item');
+    function filter() {
+      const query = search.value.trim().toLocaleLowerCase(); let count=0;
+      items.forEach(item=>{const matches=(category==='all'||item.dataset.group===category)&&item.textContent.toLocaleLowerCase().includes(query);item.hidden=!matches;if(matches)count++;});
+      $('#faq-empty').hidden=count!==0;
+      $('#faq-count').textContent=text(`พบ ${count} คำถาม`,`${count} question${count===1?'':'s'} found`);
+    }
+    $$('[data-faq-filter]').forEach(b=>b.addEventListener('click',()=>{category=b.dataset.faqFilter;$$('[data-faq-filter]').forEach(f=>f.setAttribute('aria-pressed',String(f===b)));filter();}));
+    search.addEventListener('input',filter);
+    $('#reset-faq').addEventListener('click',()=>{search.value='';category='all';$$('[data-faq-filter]').forEach(f=>f.setAttribute('aria-pressed',String(f.dataset.faqFilter==='all')));filter();search.focus();});
+    document.addEventListener('languagechange',filter);
+  }
+  applyLanguage(lang());
+})();
