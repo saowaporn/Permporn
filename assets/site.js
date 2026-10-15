@@ -117,7 +117,7 @@
     // Let the link navigate before collapsing the dropdown that contains it.
     setTimeout(closeMenu,0);
   }));
-  window.matchMedia('(min-width:1081px)').addEventListener('change', closeMenu);
+  window.matchMedia('(min-width:1181px)').addEventListener('change', closeMenu);
   const contactToggle = $('#contact-toggle');
   const contactOptions = $('#contact-options');
   if (contactToggle && contactOptions) {
