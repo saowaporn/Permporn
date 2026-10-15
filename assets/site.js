@@ -24,6 +24,70 @@
     try { localStorage.setItem('permporn-language', b.dataset.language); } catch (_) {}
     applyLanguage(b.dataset.language);
   }));
+  const announcement = $('.topline-slider');
+  if (announcement) {
+    const track = announcement.querySelector('.topline-track');
+    const messages = [...track.querySelectorAll('.topline-message:not(.topline-clone)')];
+    const pauseButton = $('.topline-pause');
+    const topbar = announcement.closest('.topline');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion:reduce)');
+    let index = 0;
+    let paused = reducedMotion.matches;
+    let hovered = false;
+    let focused = false;
+    let timer;
+    const updatePause = () => {
+      pauseButton.classList.toggle('is-paused',paused);
+      pauseButton.setAttribute('aria-pressed',String(paused));
+      pauseButton.dataset.labelTh = paused ? 'เล่นข้อความอัตโนมัติ' : 'หยุดข้อความชั่วคราว';
+      pauseButton.dataset.labelEn = paused ? 'Play announcements' : 'Pause announcements';
+      pauseButton.setAttribute('aria-label',text(pauseButton.dataset.labelTh,pauseButton.dataset.labelEn));
+      pauseButton.title = pauseButton.getAttribute('aria-label');
+    };
+    const resetLoop = () => {
+      if (index !== messages.length) return;
+      track.classList.add('is-resetting');
+      index = 0;
+      track.style.setProperty('--announcement-index',0);
+      void track.offsetHeight;
+      track.classList.remove('is-resetting');
+    };
+    const advance = () => {
+      if (paused || hovered || focused || document.hidden) return;
+      resetLoop();
+      index += 1;
+      if (reducedMotion.matches && index === messages.length) index = 0;
+      const active = index % messages.length;
+      messages.forEach((message,i) => {
+        message.inert = i !== active;
+        message.setAttribute('aria-hidden',String(i !== active));
+        message.querySelectorAll('a').forEach(a => a.tabIndex = i === active ? 0 : -1);
+      });
+      track.style.setProperty('--announcement-index',index);
+    };
+    track.addEventListener('transitionend',e => {
+      if (e.target === track && e.propertyName === 'transform') resetLoop();
+    });
+    pauseButton.addEventListener('click',() => {
+      paused=!paused;
+      if (!paused) focused=false;
+      updatePause();
+    });
+    topbar.addEventListener('mouseenter',() => hovered=true);
+    topbar.addEventListener('mouseleave',() => hovered=false);
+    topbar.addEventListener('focusin',() => focused=true);
+    topbar.addEventListener('focusout',e => focused=topbar.contains(e.relatedTarget));
+    reducedMotion.addEventListener('change',e => {
+      if (e.matches) {paused=true;resetLoop();updatePause();}
+    });
+    document.addEventListener('languagechange',updatePause);
+    const start = () => {clearInterval(timer);timer=setInterval(advance,4000);};
+    window.addEventListener('pagehide',() => clearInterval(timer));
+    window.addEventListener('pageshow',start);
+    pauseButton.hidden=false;
+    updatePause();
+    start();
+  }
   const menu = $('.menu-button'); const nav = $('#main-nav');
   function closeMenu() {
     nav.classList.remove('is-open');
