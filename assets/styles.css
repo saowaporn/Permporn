@@ -16,3 +16,24 @@
 /* Contact channel picker, email form, and appointment map */
 .contact-options{position:fixed;right:25px;bottom:92px;z-index:35;width:335px;max-width:calc(100vw - 30px);background:#fff;border:1px solid #d4c6a4;border-radius:10px;box-shadow:0 12px 45px #0003;padding:20px;color:var(--ink)}.contact-options-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.contact-options-heading h2{font:500 18px/1.5 var(--sans)}.contact-options-close{display:grid;place-items:center;width:32px;height:32px;padding:7px;border:0;border-radius:50%;background:var(--soft);color:#666;flex-shrink:0}.contact-options-close svg{width:18px;height:18px}.contact-option{display:flex;align-items:center;gap:13px;min-height:68px;padding:12px 5px;border-top:1px solid #e9e5dc}.contact-option:hover{color:var(--gold-dark);background:#faf7ef}.contact-option>span:last-child{min-width:0}.contact-option strong{display:block;font-size:14px;font-weight:500;line-height:1.5}.contact-option small{display:block;font-size:11px;color:#666;line-height:1.6;overflow-wrap:anywhere}.option-symbol{display:grid;place-items:center;width:35px;height:35px;border-radius:50%;border:1px solid #dccba6;color:var(--gold-dark);font:22px Georgia,serif;flex-shrink:0}.floating-contact{cursor:pointer}.map-section{padding-top:0}.map-layout{display:grid;grid-template-columns:.8fr 1.2fr;gap:55px;align-items:center}.map-layout p{font-size:15px}.map-layout .button{margin-top:25px}.location-map{display:block;width:100%;height:340px;border:1px solid var(--line);border-radius:5px;background:var(--soft)}.consent-label{display:flex;gap:10px;align-items:flex-start;font-size:12px;line-height:1.8;color:#616161;margin-top:20px}.consent-label input{width:18px;height:18px;min-height:0;padding:0;margin-top:3px;flex:0 0 18px;accent-color:var(--gold-dark)}.consent-label a{text-decoration:underline;color:var(--gold-dark)}.form-trap{position:absolute;left:-10000px;opacity:0;pointer-events:none}.email-app-link{width:100%;font-size:12px;margin-top:12px}.form-status[data-state=sent]{color:#28624b!important}.form-status[data-state=error],.form-status[data-state=rate],.form-status[data-state=invalid]{color:#8a3526!important}button:disabled{opacity:.65;cursor:wait}.inquiry-card #form-status{font-size:13px;line-height:1.8;margin-top:18px}
 @media(max-width:760px){.contact-options{right:15px;bottom:78px;padding:18px;width:320px}.map-layout{grid-template-columns:1fr;gap:28px}.location-map{height:300px}.map-layout p{font-size:14px}.contact-options-heading h2{font-size:17px}}
+/* Keep both enquiry actions together; reveal the message beside its copy tools. */
+.inquiry-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:22px}
+.inquiry-actions .button{width:100%;min-height:50px;margin:0;padding:12px 14px;font-size:13px}
+.inquiry-actions svg,.inquiry-copy svg{width:18px;height:18px;flex:0 0 18px}
+.inquiry-share-chevron{transition:transform .18s ease}
+[aria-expanded=true]>.inquiry-share-chevron{transform:rotate(180deg)}
+.inquiry-card #form-status:empty{min-height:0;margin:0}
+.inquiry-card #form-status:not(:empty){margin-top:12px;min-height:0}
+.inquiry-share{margin-top:18px;padding:20px;background:#fff;border:1px solid #d8c9a8;border-radius:3px;scroll-margin-top:110px;scroll-margin-bottom:90px}
+.inquiry-message-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.inquiry-message-heading>label{font-size:14px;font-weight:500}
+.inquiry-copy{min-height:44px;margin:0;padding:9px 13px;background:var(--ink);color:#fff;border-color:var(--ink);font-size:12px}
+.inquiry-copy:hover{background:#363126;border-color:#363126}
+.inquiry-share-note{font-size:12px;line-height:1.8;margin-top:12px}
+#inquiry-message{display:block;margin-top:14px;min-height:210px;max-height:420px;font-size:13px;line-height:1.9;background:#fbfbf9;border-color:#dedbd2;cursor:text}
+.inquiry-copy-status{font-size:12px;line-height:1.8;color:#28624b;margin-top:10px}
+.inquiry-copy-status:empty{margin:0}
+.inquiry-channel-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
+.inquiry-channel-link{display:flex;align-items:center;justify-content:center;min-height:44px;padding:8px 10px;border:1px solid var(--line);border-radius:2px;font-size:12px;color:var(--ink);background:#fff}
+.inquiry-channel-link:hover{background:#faf6ec;border-color:#b69a60;color:var(--gold-dark)}
+@media(max-width:760px){.inquiry-actions{grid-template-columns:1fr}.inquiry-share{padding:16px}.inquiry-message-heading{gap:10px}.inquiry-message-heading>label{font-size:13px}.inquiry-copy{font-size:11px;padding-inline:10px}}

@@ -27,10 +27,23 @@ module.exports = ({t,tx,pageLead,field,data,line,wa,external,button,mapsLink,map
     <div class="form-trap" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
     <p class="form-note">${t('รูปอ้างอิงสามารถแนบผ่านแอปอีเมล หรือส่งให้ทีมงานภายหลังได้','You can attach reference images through your email app or share them with our team afterwards.')}</p>
     <label class="consent-label"><input id="consent" name="consent" type="checkbox" required><span>${t('ยินยอมให้ใช้ข้อมูลที่ส่งเพื่อตอบคำถามและเสนอราคา','I agree to the use of these details to respond to my enquiry and provide a quotation.')} <a href="#privacy">${t('ข้อมูลการสอบถาม','Enquiry information')}</a></span></label>
-    <button id="send-inquiry" type="submit" class="button button-gold">${t('ส่งรายละเอียดทางอีเมล','Send enquiry by email')}</button>
+    <div class="inquiry-actions">
+      <button id="send-inquiry" type="submit" class="button button-gold"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.6"/></svg>${t('ส่งทางอีเมล','Send by email')}</button>
+      <button id="toggle-inquiry-share" type="button" class="button button-outline-dark" aria-expanded="false" aria-controls="inquiry-share">${t('ส่งผ่านแอปอื่น','Use another app')}<svg class="inquiry-share-chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
     <p id="form-status" class="form-status" role="status" aria-live="polite" tabindex="-1"></p>
-    <a id="send-email" class="button button-outline-dark email-app-link" href="mailto:contact@permporn-accessories.com">${t('ส่งผ่านแอปอีเมลพร้อมรายละเอียด','Open email app with these details')}</a>
-    <p class="form-note">${t('ปุ่มส่งผ่านแอปอีเมลจะใส่ผู้รับและรายละเอียดที่กรอกให้ทันที แล้วให้คุณกดส่งในแอป','The email-app option fills in the recipient and your details automatically. Press send in your email app.')}</p>
+    <div id="inquiry-share" class="inquiry-share" hidden>
+      <div class="inquiry-message-heading"><label for="inquiry-message">${t('ข้อความสำหรับส่งต่อ','Your enquiry message')}</label><button id="copy-inquiry" type="button" class="button inquiry-copy"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M15 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3" stroke="currentColor" stroke-width="1.6"/></svg><span id="copy-inquiry-label">${t('คัดลอกข้อความ','Copy message')}</span></button></div>
+      <p id="share-note" class="inquiry-share-note">${t('ข้อความอัปเดตตามรายละเอียดที่กรอก คัดลอกแล้วเปิดแอปที่ต้องการเพื่อวางและส่ง','This message updates as you fill in the form. Copy it, then open your preferred app to paste and send.')}</p>
+      <textarea id="inquiry-message" rows="8" readonly aria-describedby="share-note" spellcheck="false"></textarea>
+      <p id="copy-inquiry-status" class="inquiry-copy-status" role="status" aria-live="polite"></p>
+      <div class="inquiry-channel-links" role="group" aria-label="LINE, WhatsApp, Facebook, Email">
+        <a class="inquiry-channel-link" href="${line}" ${external}>LINE</a>
+        <a id="share-whatsapp" class="inquiry-channel-link" href="${wa}" ${external}>WhatsApp</a>
+        <a class="inquiry-channel-link" href="https://www.facebook.com/permpornaccessories/" ${external}>Facebook</a>
+        <a id="send-email" class="inquiry-channel-link" href="mailto:contact@permporn-accessories.com">${t('แอปอีเมล','Email app')}</a>
+      </div>
+    </div>
   </form></div>
 </section>
 <section class="map-section section container" id="location"><div class="map-layout"><div><h2>${t('มาพบเราที่เพิ่มพร','Visit Permporn Accessories')}</h2><p>${t('1/1 ซอยติวานนท์ 18 ถนนติวานนท์ ตำบลตลาดขวัญ อำเภอเมืองนนทบุรี จังหวัดนนทบุรี 11000','1/1 Soi Tiwanon 18, Tiwanon Road, Talat Khwan, Mueang Nonthaburi, Nonthaburi 11000, Thailand')}</p><p>${t('กรุณานัดหมายล่วงหน้าก่อนเข้าพบ','Please arrange an appointment before visiting.')}</p>${button(mapsLink,'เปิดแผนที่และเส้นทาง','Open map and directions','gold',external)}</div><iframe class="location-map" src="${mapEmbed}" title="แผนที่เพิ่มพร เครื่องประดับ / Permporn Accessories map" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div></section>

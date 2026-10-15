@@ -30,7 +30,16 @@
     });
     return out;
   };
-  const emailLink=()=>{
+  const message=$('#inquiry-message');
+  const sharePanel=$('#inquiry-share');
+  const shareToggle=$('#toggle-inquiry-share');
+  const copyButton=$('#copy-inquiry');
+  let copyState='',copying=false;
+  const renderCopy=()=>{
+    $('#copy-inquiry-label').textContent=copyState==='copied'?text('คัดลอกแล้ว','Copied'):text('คัดลอกข้อความ','Copy message');
+    $('#copy-inquiry-status').textContent=copyState==='copied'?text('คัดลอกข้อความแล้ว วางในแอปที่ต้องการได้เลย','Message copied. Paste it into your preferred app.'):copyState==='manual'?text('เลือกข้อความไว้แล้ว ใช้เมนูคัดลอกของอุปกรณ์ หรือกด Ctrl/Cmd + C','Message selected. Use your device’s Copy menu or press Ctrl/Cmd + C.'):'';
+  };
+  const syncMessage=()=>{
     const labels={name:text('ชื่อ','Name'),email:text('อีเมลติดต่อกลับ','Reply email'),category:text('หมวด','Collection'),item:text('ลักษณะงาน','Item'),gem:text('ชนิดพลอย','Gemstone'),shape:text('รูปทรง','Shape'),size:text('น้ำหนัก / ขนาด','Weight / size'),metal:text('วัสดุ','Metal'),budget:text('งบประมาณ','Budget'),date:text('วันที่ต้องการ','Required date'),details:text('รายละเอียด','Details')};
     const rows=[text('สวัสดี เพิ่มพร เครื่องประดับ ขอสอบถามข้อมูลดังนี้','Hello Permporn Accessories, I would like to enquire about:'),''];
     names.forEach(name=>{
@@ -38,7 +47,10 @@
       if(el.closest('.form-field').hidden||!el.value.trim())return;
       rows.push(labels[name]+': '+(el.tagName==='SELECT'?el.selectedOptions[0].textContent:el.value.trim()));
     });
-    $('#send-email').href='mailto:contact@permporn-accessories.com?subject='+encodeURIComponent(text('สอบถามสินค้าและงานสั่งทำ — PERMPORN','Product and custom jewelry enquiry — PERMPORN'))+'&body='+encodeURIComponent(rows.join('\n'));
+    const content=rows.join('\n');
+    if(message.value!==content){message.value=content;copyState='';renderCopy();}
+    $('#send-email').href='mailto:contact@permporn-accessories.com?subject='+encodeURIComponent(text('สอบถามสินค้าและงานสั่งทำ — PERMPORN','Product and custom jewelry enquiry — PERMPORN'))+'&body='+encodeURIComponent(content);
+    $('#share-whatsapp').href='https://wa.me/66836870818?text='+encodeURIComponent(content);
     document.querySelectorAll('.contact-option[href^="mailto:"]').forEach(a=>a.href=$('#send-email').href);
   };
   let state='',busy=false;
@@ -47,20 +59,42 @@
     const messages={
       sending:text('กำลังส่งรายละเอียด…','Sending your enquiry…'),
       sent:text('ส่งคำขอแล้ว ทีมงานจะติดต่อกลับทางอีเมลที่คุณระบุ','Your enquiry has been sent. Our team will reply to the email you provided.'),
-      rate:text('ส่งคำขอบ่อยเกินไป กรุณารอสักครู่ หรือใช้ปุ่มส่งผ่านแอปอีเมล','Too many requests. Please wait a little or use the email-app option.'),
+      rate:text('ส่งคำขอบ่อยเกินไป กรุณารอสักครู่ หรือเลือกส่งผ่านแอปอื่น','Too many requests. Please wait a little or choose another app.'),
       invalid:text('กรุณาตรวจสอบอีเมลและรายละเอียด แล้วลองอีกครั้ง','Please check your email and details, then try again.'),
-      error:text('ยังส่งคำขอไม่ได้ ข้อมูลที่กรอกยังอยู่ครบ ลองอีกครั้งหรือส่งผ่านแอปอีเมลด้านล่าง','We could not send your enquiry. Your details are still here. Try again or use the email-app option below.')
+      error:text('ยังส่งคำขอไม่ได้ ข้อมูลที่กรอกยังอยู่ครบ ลองอีกครั้งหรือเลือกส่งผ่านแอปอื่น','We could not send your enquiry. Your details are still here. Try again or choose another app.')
     };
     status.textContent=messages[state]||'';
     status.dataset.state=state;
   };
   $('#category').addEventListener('change',()=>{
     if($('#category').value==='custom-jewelry'&&$('#item').value==='loose')$('#item').value='rings';
-    visibility();emailLink();
+    visibility();syncMessage();
   });
-  form.addEventListener('input',()=>{if(!busy){state='';renderStatus();}emailLink();});
-  form.addEventListener('change',()=>{visibility();emailLink();});
-  document.addEventListener('languagechange',()=>{emailLink();renderStatus();});
+  form.addEventListener('input',()=>{if(!busy){state='';renderStatus();}syncMessage();});
+  form.addEventListener('change',()=>{visibility();syncMessage();});
+  document.addEventListener('languagechange',()=>{syncMessage();renderStatus();renderCopy();});
+  shareToggle.addEventListener('click',()=>{
+    const opening=sharePanel.hidden;
+    sharePanel.hidden=!opening;
+    shareToggle.setAttribute('aria-expanded',String(opening));
+    if(opening){syncMessage();message.focus({preventScroll:true});sharePanel.scrollIntoView({block:'nearest'});}
+  });
+  sharePanel.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){sharePanel.hidden=true;shareToggle.setAttribute('aria-expanded','false');shareToggle.focus();}
+  });
+  copyButton.addEventListener('click',async()=>{
+    if(copying)return;
+    const content=message.value;
+    copying=true;copyButton.disabled=true;
+    try{
+      if(!navigator.clipboard?.writeText)throw new Error('Clipboard unavailable');
+      await navigator.clipboard.writeText(content);
+      copyState=message.value===content?'copied':'';
+    }catch(_){
+      message.focus();message.select();message.setSelectionRange(0,message.value.length);
+      copyState='manual';
+    }finally{copying=false;copyButton.disabled=false;renderCopy();}
+  });
   form.addEventListener('submit',async e=>{
     e.preventDefault();
     if(busy||!form.reportValidity())return;
@@ -85,5 +119,5 @@
       renderStatus();$('#form-status').focus({preventScroll:true});
     }
   });
-  visibility();emailLink();form.hidden=false;
+  visibility();syncMessage();form.hidden=false;
 })();
