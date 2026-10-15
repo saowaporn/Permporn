@@ -42,6 +42,7 @@
 body[data-page=index]{background:#000}
 body[data-page=index] main{--ink:#f4f1e9;--muted:#c3bfb6;--soft:#0b0b0a;--line:#332d21;--gold-dark:#d6bb7b;color:var(--ink)}
 body[data-page=index] .section-note{color:#aaa59b}
+body[data-page=index] .button-outline-dark{color:#e0c585;border-color:#8b753f}
 body[data-page=index] .button-outline-dark:hover{background:#c9a9611a;color:#f1d799}
 
 /* Shared responsive rhythm for all pages. Content determines section height. */
