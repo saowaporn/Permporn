@@ -38,6 +38,12 @@
 .inquiry-channel-link:hover{background:#faf6ec;border-color:#b69a60;color:var(--gold-dark)}
 @media(max-width:760px){.inquiry-actions{grid-template-columns:1fr}.inquiry-share{padding:16px}.inquiry-message-heading{gap:10px}.inquiry-message-heading>label{font-size:13px}.inquiry-copy{font-size:11px;padding-inline:10px}}
 
+/* Keep the homepage continuous with the black jewelry cover. */
+body[data-page=index]{background:#000}
+body[data-page=index] main{--ink:#f4f1e9;--muted:#c3bfb6;--soft:#0b0b0a;--line:#332d21;--gold-dark:#d6bb7b;color:var(--ink)}
+body[data-page=index] .section-note{color:#aaa59b}
+body[data-page=index] .button-outline-dark:hover{background:#c9a9611a;color:#f1d799}
+
 /* Shared responsive rhythm for all pages. Content determines section height. */
 :root{--page-gutter:clamp(16px,3.3vw,48px);--header-height:92px;--section-space:clamp(42px,5.5vw,86px)}
 html{scroll-padding-top:calc(var(--header-height) + 16px)}
