@@ -35,11 +35,11 @@ function header(id) {
   <header class="site-header"><div class="header-inner container">
     <a class="brand" href="index.html" aria-label="PERMPORN ACCESSORIES"><img src="assets/permporn-logo-mark.png" alt="" width="55" height="55"><span class="wordmark">PERMPORN<span>ACCESSORIES</span></span></a>
     <button class="menu-button" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="เปิดเมนู" data-label-th="เปิดเมนู" data-label-en="Open navigation"><span></span><span></span><span></span></button>
-    <nav id="main-nav" class="main-nav" aria-label="Main navigation"><a href="index.html" ${currentAttr(id==='index')}>${t('หน้าแรก','Home')}</a>
+    <nav id="main-nav" class="main-nav" aria-label="Main navigation"><div class="nav-links"><a href="index.html" ${currentAttr(id==='index')}>${t('หน้าแรก','Home')}</a>
     <details class="nav-dropdown"><summary class="${collectionActive?'active':''}" aria-controls="collections-menu"><span class="nav-label">${t('สินค้าและงานสั่งทำ','Collections')}</span><svg class="nav-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></summary><div class="dropdown-panel" id="collections-menu">${link('collections',['ดูทุกหมวด','Explore all'],'dropdown-overview')}${data.collections.map(c=>`<a href="${c.id}.html" ${currentAttr(c.id===id)}>${tx(c.name)}</a>`).join('')}</div></details>
     ${navItems.map(([key,names])=>`<a href="${key}.html" ${currentAttr(key===id)}>${tx(names)}</a>`).join('')}
-    <div class="language-switch" role="group" aria-label="Language"><button type="button" data-language="th" aria-pressed="true">TH</button><span aria-hidden="true">/</span><button type="button" data-language="en" aria-pressed="false">EN</button></div>
-    <a class="nav-contact" href="contact.html" ${currentAttr(id==='contact')}>${t('นัดหมายปรึกษา','Get in touch')}</a></nav>
+    </div><div class="nav-tools"><div class="language-switch" role="group" aria-label="Language"><button type="button" data-language="th" aria-pressed="true">TH</button><span aria-hidden="true">/</span><button type="button" data-language="en" aria-pressed="false">EN</button></div>
+    <a class="nav-contact" href="contact.html" ${currentAttr(id==='contact')}>${t('นัดหมายปรึกษา','Get in touch')}</a></div></nav>
   </div></header>`;
 }
 function footer() {

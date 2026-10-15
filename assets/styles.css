@@ -45,7 +45,12 @@ html{scroll-padding-top:calc(var(--header-height) + 16px)}
 .section,.story-section{padding-block:var(--section-space)}
 .faq-preview{padding-top:0}
 .map-section{padding-top:0}
-.header-inner{height:var(--header-height)}
+.header-inner{height:var(--header-height);gap:24px}
+.header-inner>.brand{flex:0 0 200px}
+.main-nav{flex:1;min-width:0;gap:24px}
+.nav-links{display:flex;align-items:center;justify-content:center;flex:1;min-width:0;gap:clamp(16px,1.35vw,24px)}
+.nav-links>a{display:flex;align-items:center;min-height:44px;padding-block:14px;color:#eee;white-space:nowrap}
+.nav-tools{display:flex;align-items:center;justify-content:flex-end;flex:0 0 200px;gap:16px}
 .brand img,.menu-button{flex-shrink:0}
 .menu-button{width:44px;height:44px}
 :where(.collection-grid,.story-grid,.split-content,.category-hero,.criteria-grid,.gemstone-grid,.values-grid,.agreement-grid,.order-layout,.contact-layout,.custom-panel,.footer-grid,.form-grid)>*{min-width:0}
@@ -101,6 +106,12 @@ input,select,textarea{min-width:0;max-width:100%}
 
 @media(max-width:1180px){
   :root{--header-height:80px}
+  .header-inner>.brand{flex:0 0 auto}
+  .nav-links{flex-direction:column;align-items:stretch;gap:0;flex:initial}
+  .nav-links>a{padding:13px 0;border-bottom:1px solid #252525;min-height:48px}
+  .nav-tools{flex:initial;justify-content:space-between;gap:16px;padding-top:16px}
+  .nav-tools .language-switch{padding-block:0}
+  .main-nav .nav-tools .nav-contact{align-self:center;margin:0}
   .menu-button{display:block}
   .main-nav{display:none;position:absolute;top:var(--header-height);left:0;right:0;background:#000;padding:16px var(--page-gutter) 24px;border-top:1px solid #302919;box-shadow:0 12px 20px #0004;max-height:calc(100dvh - var(--header-height) - 48px);overflow:auto;align-items:stretch;font-size:15px}
   .main-nav.is-open{display:flex;flex-direction:column;gap:0}
