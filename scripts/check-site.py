@@ -5,7 +5,7 @@ from urllib.parse import urlsplit, unquote
 import sys
 import re
 
-root = Path(__file__).resolve().parents[1]
+root = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else Path(__file__).resolve().parents[1]
 errors = []
 
 class Page(HTMLParser):

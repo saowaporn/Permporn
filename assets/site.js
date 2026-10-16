@@ -150,19 +150,6 @@
     contactOptions.querySelectorAll('.contact-option').forEach(a=>a.addEventListener('click',()=>setTimeout(()=>closeContact(),0)));
   }
   $('#year').textContent = new Date().getFullYear();
-  const shapeLinks = $$('[data-shape]');
-  if (shapeLinks.length) {
-    let shape = ''; const carat = $('#carat');
-    const update = () => {
-      const parts = [shape, carat.value].filter(Boolean);
-      $('#preference-summary').textContent = parts.length ? text('ความต้องการ: ','Preferences: ')+parts.join(' / ') : text('เลือกทรงและน้ำหนัก หรือให้เราช่วยแนะนำได้','Choose a shape and weight, or ask us for guidance.');
-      const query = new URLSearchParams({category:$('#shape-inquiry').dataset.category});
-      if(shape)query.set('shape',shape); if(carat.value)query.set('size',carat.value);
-      $('#shape-inquiry').href='contact.html?'+query+'#inquiry';
-    };
-    shapeLinks.forEach(a => {a.setAttribute('role','button');a.addEventListener('click',e => {e.preventDefault();shape=shape===a.dataset.shape?'':a.dataset.shape;shapeLinks.forEach(l=>l.setAttribute('aria-pressed',String(l.dataset.shape===shape)));update();});a.addEventListener('keydown',e=>{if(e.key===' '){e.preventDefault();a.click();}});});
-    carat.addEventListener('change', update); document.addEventListener('languagechange',update);
-  }
   const tabs = $$('[data-tab]');
   if(tabs.length) {
     function selectTab(tab, focus=false) {

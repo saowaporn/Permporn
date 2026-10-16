@@ -7,6 +7,22 @@
   const locale=()=>document.documentElement.lang==='en'?'en':'th';
   const text=(th,en)=>locale()==='th'?th:en;
   const names=['name','email','category','item','gem','shape','size','metal','budget','date','details'];
+  const budget=$('#budget');
+  const formatBudget=()=>{
+    const raw=budget.value,caret=budget.selectionStart??raw.length;
+    const before=raw.slice(0,caret).replace(/[^\d.]/g,'').length;
+    const cleaned=raw.replace(/[^\d.]/g,'');
+    const [integer,...fractions]=cleaned.split('.');
+    const grouped=integer.replace(/^0+(?=\d)/,'').replace(/\B(?=(\d{3})+(?!\d))/g,',');
+    const formatted=grouped+(fractions.length?'.'+fractions.join('').slice(0,2):'');
+    if(formatted===raw)return;
+    budget.value=formatted;
+    let position=0,seen=0;
+    while(position<formatted.length&&seen<before){if(/[\d.]/.test(formatted[position]))seen++;position++;}
+    budget.setSelectionRange(position,position);
+  };
+  budget.addEventListener('input',e=>{if(!e.isComposing)formatBudget();});
+  budget.addEventListener('compositionend',()=>{formatBudget();budget.dispatchEvent(new Event('input',{bubbles:true}));});
   const params=new URLSearchParams(location.search);
   // Only collection preferences are accepted from the URL, never personal information.
   ['category','item','gem','shape','size','metal'].forEach(name=>{
