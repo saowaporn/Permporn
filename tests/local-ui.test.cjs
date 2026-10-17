@@ -4,9 +4,14 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
-function page(name,query=''){
+function page(name,query='',dialogs=false){
   const dom=new JSDOM(fs.readFileSync(path.join(root,name+'.html'),'utf8'),{url:'http://localhost:4174/'+name+'.html'+query,runScripts:'outside-only'});
   const w=dom.window;
+  // jsdom has no native modal implementation; model only its open/close lifecycle.
+  if(dialogs){
+    w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
+    w.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new w.Event('close'));};
+  }
   w.matchMedia=()=>({matches:false,addEventListener(){}});
   w.HTMLElement.prototype.scrollIntoView=function(){};
   w.fetch=()=>{throw new Error('UI tests must not send requests');};
@@ -14,6 +19,70 @@ function page(name,query=''){
   if(name==='contact')w.eval(fs.readFileSync(path.join(root,'assets/inquiry-form.js'),'utf8'));
   return dom;
 }
+
+test('enquiry information opens without consent, preserves the form, and accepts explicitly',()=>{
+  const dom=page('contact','',true),w=dom.window,d=w.document;
+  try{
+    const trigger=d.querySelector('#privacy-trigger'),dialog=d.querySelector('#privacy-dialog'),consent=d.querySelector('#consent');
+    const details=d.querySelector('#details');details.value='Keep this enquiry while reading';
+    const originalHash=w.location.hash;
+    trigger.focus();trigger.click();
+    assert.equal(dialog.open,true);
+    assert.equal(w.location.hash,originalHash);
+    assert.equal(consent.checked,false);
+    assert.equal(d.querySelector('#privacy-dialog-body').textContent,d.querySelector('#privacy .narrow').textContent.replace(d.querySelector('#privacy h2').textContent,''));
+    dialog.querySelector('[data-privacy-close]').click();
+    assert.equal(dialog.open,false);
+    assert.equal(consent.checked,false);
+    assert.equal(d.activeElement,trigger);
+    assert.equal(details.value,'Keep this enquiry while reading');
+    trigger.click();
+    const privacyConsent=d.querySelector('#privacy-consent');
+    assert.equal(privacyConsent.checked,false);
+    privacyConsent.click();
+    assert.equal(dialog.open,false);
+    assert.equal(consent.checked,true);
+    assert.equal(d.activeElement,consent);
+    assert.equal(details.value,'Keep this enquiry while reading');
+    trigger.click();assert.equal(privacyConsent.checked,true);
+    privacyConsent.click();assert.equal(consent.checked,false);
+    assert.equal(dialog.open,true);
+    dialog.querySelector('label[for="privacy-consent"]').click();assert.equal(consent.checked,true);
+    assert.equal(dialog.open,false);
+    assert.equal(consent.checked,true);
+    assert.equal(d.activeElement,consent);
+    assert.equal(d.documentElement.classList.contains('privacy-dialog-open'),false);
+    assert.equal(new w.FormData(d.querySelector('form')).get('consent'),'on');
+    consent.click();assert.equal(consent.checked,false);assert.equal(privacyConsent.checked,false);
+    trigger.click();dialog.querySelector('.privacy-dialog-close').click();
+    consent.click();assert.equal(consent.checked,true);assert.equal(privacyConsent.checked,true);
+    trigger.click();assert.equal(privacyConsent.checked,true);dialog.close();assert.equal(consent.checked,true);
+  }finally{w.close();}
+});
+
+test('enquiry information supports English, backdrop dismissal, and a plain-link fallback',()=>{
+  const dom=page('contact','',true),w=dom.window,d=w.document;
+  try{
+    d.querySelector('[data-language=en]').click();
+    const dialog=d.querySelector('#privacy-dialog');d.querySelector('#privacy-trigger').click();
+    assert.equal(dialog.querySelector('[data-privacy-close]').getAttribute('aria-label'),'Close enquiry information');
+    assert.match(d.querySelector('#privacy-dialog-body .lang-en').textContent,/Your name, email/);
+    dialog.getBoundingClientRect=()=>({left:20,top:20,right:600,bottom:700});
+    dialog.dispatchEvent(new w.MouseEvent('click',{bubbles:true,clientX:30,clientY:30}));
+    assert.equal(dialog.open,true);
+    dialog.dispatchEvent(new w.MouseEvent('click',{bubbles:true,clientX:5,clientY:5}));
+    assert.equal(dialog.open,false);
+    assert.equal(d.querySelector('#consent').checked,false);
+  }finally{w.close();}
+  const fallback=page('contact');
+  try{
+    const d=fallback.window.document;
+    assert.equal(d.querySelector('#privacy-trigger').getAttribute('href'),'#privacy');
+    assert.equal(d.querySelector('#privacy-trigger').hasAttribute('aria-haspopup'),false);
+    assert.equal(d.querySelector('#privacy').hidden,false);
+    assert.equal(d.querySelector('#inquiry-form').hidden,false);
+  }finally{fallback.window.close();}
+});
 test('native collection select updates visible fields and shareable message',()=>{
   const dom=page('contact'),w=dom.window,d=w.document;
   try{

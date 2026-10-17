@@ -6,6 +6,49 @@
   const $=selector=>document.querySelector(selector);
   const locale=()=>document.documentElement.lang==='en'?'en':'th';
   const text=(th,en)=>locale()==='th'?th:en;
+  const privacyDialog=$('#privacy-dialog');
+  const privacyTrigger=$('#privacy-trigger');
+  if(privacyDialog&&privacyTrigger&&typeof privacyDialog.showModal==='function'){
+    const consent=$('#consent');
+    const privacyConsent=$('#privacy-consent');
+    const syncConsent=()=>{privacyConsent.checked=consent.checked;};
+    consent.addEventListener('input',syncConsent);
+    consent.addEventListener('change',syncConsent);
+    syncConsent();
+    const privacyBody=$('#privacy-dialog-body');
+    $('#privacy').querySelectorAll('p').forEach(p=>privacyBody.append(p.cloneNode(true)));
+    privacyTrigger.setAttribute('aria-haspopup','dialog');
+    privacyTrigger.setAttribute('aria-controls','privacy-dialog');
+    let returnFocus=privacyTrigger;
+    privacyTrigger.addEventListener('click',e=>{
+      e.preventDefault();
+      if(privacyDialog.open)return;
+      returnFocus=privacyTrigger;
+      syncConsent();
+      privacyDialog.showModal();
+      privacyBody.scrollTop=0;
+      document.documentElement.classList.add('privacy-dialog-open');
+    });
+    privacyDialog.querySelectorAll('[data-privacy-close]').forEach(button=>{
+      button.addEventListener('click',()=>privacyDialog.close());
+    });
+    privacyConsent.addEventListener('change',()=>{
+      consent.checked=privacyConsent.checked;
+      consent.dispatchEvent(new Event('input',{bubbles:true}));
+      consent.dispatchEvent(new Event('change',{bubbles:true}));
+      returnFocus=consent;
+      if(privacyConsent.checked&&privacyDialog.open)privacyDialog.close();
+    });
+    privacyDialog.addEventListener('click',e=>{
+      if(e.target!==privacyDialog)return;
+      const rect=privacyDialog.getBoundingClientRect();
+      if(e.clientX<rect.left||e.clientX>rect.right||e.clientY<rect.top||e.clientY>rect.bottom)privacyDialog.close();
+    });
+    privacyDialog.addEventListener('close',()=>{
+      document.documentElement.classList.remove('privacy-dialog-open');
+      returnFocus.focus({preventScroll:true});
+    });
+  }
   const names=['name','email','category','item','gem','shape','size','metal','budget','date','details'];
   const budget=$('#budget');
   const formatBudget=()=>{

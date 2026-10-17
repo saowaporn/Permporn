@@ -269,6 +269,7 @@ input,select,textarea{min-width:0;max-width:100%}
   .values-grid,.agreement-grid{grid-template-columns:1fr;gap:28px}
   .notice,.dark-panel{padding:24px}
   .notice h2,.dark-panel h2{font-size:26px}
+  .notice h2 .sourcing-heading-line{display:block;white-space:nowrap}
   .inquiry-card{padding:24px}
   .contact-details h2,.inquiry-card>h2{font-size:28px}
   .inquiry-card>p{font-size:14px}
@@ -328,6 +329,32 @@ input,select,textarea{min-width:0;max-width:100%}
   .hero h1{font-size:clamp(28px,4vw,34px);max-width:70%}
   .hero-copy{max-width:70%;font-size:14px}
   .hero-brand{margin-bottom:10px}
+}
+
+.contact-app-icon{display:block;width:24px;height:24px;flex-shrink:0}
+.option-symbol .contact-app-icon{width:21px;height:21px}
+.contact-app-icon--line,.contact-app-icon--whatsapp,.contact-app-icon--facebook{color:var(--gold)}
+
+/* Enquiry information: scroll the text while keeping the consent control visible. */
+html.privacy-dialog-open{overflow:hidden}
+.privacy-dialog{width:min(680px,calc(100% - 32px));max-width:none;max-height:calc(100dvh - 32px);margin:auto;padding:0;border:1px solid var(--metal-line);background:#151617;color:var(--ivory);box-shadow:0 24px 80px #0008;overflow:hidden}
+.privacy-dialog:not([open]){display:none}
+.privacy-dialog::backdrop{background:#000b}
+.privacy-dialog-panel{display:flex;flex-direction:column;max-height:calc(100dvh - 34px)}
+.privacy-dialog-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 28px;border-bottom:1px solid var(--metal-line);flex-shrink:0}
+.privacy-dialog-header h2{font-size:28px;line-height:1.5}
+.privacy-dialog-close{display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;padding:10px;border:0;background:transparent;color:var(--gold)}
+.privacy-dialog-close:hover{color:var(--ivory)}
+.privacy-dialog-body{min-height:0;padding:24px 28px 8px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+.privacy-dialog-body p{font-size:15px;line-height:1.9;overflow-wrap:anywhere}
+.privacy-dialog-actions{display:flex;flex-wrap:wrap;gap:12px;padding:8px 28px 20px;flex-shrink:0}
+.privacy-dialog-actions .consent-label{width:100%;margin:0;cursor:pointer}
+@media(max-width:600px){
+  .privacy-dialog-header{padding:16px 20px}
+  .privacy-dialog-header h2{font-size:24px}
+  .privacy-dialog-body{padding:20px 20px 8px}
+  .privacy-dialog-body p{font-size:14px}
+  .privacy-dialog-actions{display:grid;grid-template-columns:1fr;padding:8px 20px 16px;gap:10px}
 }
 
 /* Local refinement: grounded imagery, clear choices, and phone-sized controls. */
