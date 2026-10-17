@@ -2,13 +2,35 @@
 const {createHash,randomUUID}=require('node:crypto');
 const catalog=require('../content/site-content.cjs');
 const RECIPIENT='contact@permporn-accessories.com';
-const MAX_BODY=16384;
+// 2 MiB of images expand to about 2.8 MiB in JSON/base64, below Vercel's 4.5 MB limit.
+const MAX_BODY=3*1024*1024;
+const IMAGE_LIMITS={count:3,each:1024*1024,total:2*1024*1024};
 const recent=new Map();
 const buckets=new Map();
 const emailPattern=/^[^\s@<>(),;:\r\n]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
 const json=(status,body)=>new Response(JSON.stringify(body),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}});
 const problem=(status,code)=>json(status,{success:false,code});
 class InputError extends Error{}
+class ImageError extends InputError{}
+function imageAttachments(images){
+  if(images===undefined)return [];
+  if(!Array.isArray(images)||images.length>IMAGE_LIMITS.count)throw new ImageError('Invalid images');
+  let total=0;
+  return images.map((image,index)=>{
+    if(!image||typeof image!=='object'||typeof image.content!=='string'||!image.content.length||image.content.length>4*Math.ceil(IMAGE_LIMITS.each/3)||image.content.length%4!==0||!/^[A-Za-z0-9+/]+={0,2}$/.test(image.content))throw new ImageError('Invalid image encoding');
+    const content=Buffer.from(image.content,'base64');
+    total+=content.length;
+    if(!content.length||content.length>IMAGE_LIMITS.each||total>IMAGE_LIMITS.total||content.toString('base64')!==image.content)throw new ImageError('Invalid image size');
+    let type,extension;
+    if(content.length>=4&&content[0]===0xff&&content[1]===0xd8&&content[2]===0xff&&content.at(-2)===0xff&&content.at(-1)===0xd9){type='image/jpeg';extension='jpg';}
+    else if(content.length>=33&&content.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))&&content.toString('ascii',12,16)==='IHDR'){type='image/png';extension='png';}
+    else if(content.length>=20&&content.toString('ascii',0,4)==='RIFF'&&content.toString('ascii',8,12)==='WEBP'&&content.readUInt32LE(4)===content.length-8){type='image/webp';extension='webp';}
+    if(!type||image.contentType!==type)throw new ImageError('Invalid image type');
+    if(typeof image.name!=='string'||image.name.length>150||/[\r\n\0]/.test(image.name))throw new ImageError('Invalid image name');
+    const stem=image.name.split(/[\\/]/).pop().replace(/\.[^.]*$/,'').replace(/[^\p{L}\p{N} _-]/gu,'').trim().slice(0,80)||`reference-${index+1}`;
+    return {filename:`${stem}.${extension}`,contentType:type,content,contentDisposition:'attachment'};
+  });
+}
 function clean(value,max,multiline=false){
   if(value===undefined||value==='')return '';
   if(typeof value!=='string'||value.length>max||(!multiline&&/[\r\n]/.test(value)))throw new InputError('Invalid field');
@@ -30,6 +52,7 @@ function validate(body){
   }
   if(!['colored-gemstones','custom-jewelry'].includes(out.category))out.gem='';
   if(out.item==='loose'&&out.category!=='custom-jewelry')out.metal='';
+  out.attachments=imageAttachments(body.attachments);
   return out;
 }
 function mailFor(data,sender,id){
@@ -42,7 +65,8 @@ function mailFor(data,sender,id){
   const labels={name:'ชื่อ / Name',email:'อีเมลติดต่อกลับ / Reply email',category:'หมวด / Collection',item:'ลักษณะงาน / Item',gem:'ชนิดพลอย / Gemstone',shape:'รูปทรง / Shape',size:'น้ำหนักหรือขนาด / Weight or size',metal:'วัสดุ / Metal',budget:'งบประมาณ / Budget',date:'วันที่ต้องการ / Required date',details:'รายละเอียด / Details'};
   const lines=['PERMPORN ACCESSORIES — Website enquiry',`Reference: ${id}`,''];
   for(const [key,label] of Object.entries(labels))if(values[key])lines.push(`${label}: ${values[key]}`);
-  return {from:{name:'PERMPORN ACCESSORIES Website',address:sender},to:RECIPIENT,replyTo:{name:data.name||'Website visitor',address:data.email},subject:`PERMPORN — สอบถามสินค้า / ${collection.name[1]}`,text:lines.join('\n'),disableFileAccess:true,disableUrlAccess:true};
+  if(data.attachments.length)lines.push(`รูปอ้างอิง / Reference images: ${data.attachments.length}`);
+  return {from:{name:'PERMPORN ACCESSORIES Website',address:sender},to:RECIPIENT,replyTo:{name:data.name||'Website visitor',address:data.email},subject:`PERMPORN — สอบถามสินค้า / ${collection.name[1]}`,text:lines.join('\n'),attachments:data.attachments,disableFileAccess:true,disableUrlAccess:true};
 }
 function gmailOptions(env){
   const user=env.GOOGLE_MAIL_USER||RECIPIENT;
@@ -81,12 +105,13 @@ async function handleInquiry(request,options={}){
     const raw=await request.text();
     if(Buffer.byteLength(raw)>MAX_BODY)return problem(413,'REQUEST_TOO_LARGE');
     data=validate(JSON.parse(raw));
-  }catch(_){return problem(400,'INVALID_ENQUIRY');}
+  }catch(error){return problem(400,error instanceof ImageError?'INVALID_IMAGES':'INVALID_ENQUIRY');}
   const transportOptions=gmailOptions(env);
   if(!transportOptions)return problem(503,'EMAIL_UNAVAILABLE');
   const now=Date.now();
   for(const [key,value] of recent)if(now-value.time>300000)recent.delete(key);
-  const signature=createHash('sha256').update(JSON.stringify(data)).digest('hex');
+  const hash=createHash('sha256').update(JSON.stringify({...data,attachments:data.attachments.map(({filename,contentType,content})=>({filename,contentType,sha256:createHash('sha256').update(content).digest('hex')}))}));
+  const signature=hash.digest('hex');
   const previous=recent.get(signature);
   if(previous){
     try{return json(200,{success:true,reference:await previous.promise});}
@@ -109,4 +134,4 @@ async function handleInquiry(request,options={}){
     return problem(502,'EMAIL_SEND_FAILED');
   }
 }
-module.exports={handleInquiry,validate,mailFor,gmailOptions,RECIPIENT};
+module.exports={handleInquiry,validate,mailFor,gmailOptions,RECIPIENT,MAX_BODY,IMAGE_LIMITS};

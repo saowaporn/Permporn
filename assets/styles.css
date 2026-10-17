@@ -351,6 +351,19 @@ input,select,textarea{min-width:0;max-width:100%}
 }
 
 .contact-app-icon{display:block;width:24px;height:24px;flex-shrink:0}
+.inquiry-images .image-picker{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;min-height:48px;margin:0;padding:12px 16px;border:1px dashed var(--gold);border-radius:3px;color:var(--gold-dark);cursor:pointer;overflow:hidden}
+.image-picker svg{width:22px;height:22px;flex-shrink:0}
+.image-picker input[type=file]{position:absolute;inset:0;width:100%;height:100%;min-height:0;margin:0;padding:0;opacity:0;cursor:pointer}
+.image-picker:focus-within{outline:3px solid var(--gold);outline-offset:4px}
+.image-picker:has(input:disabled){opacity:.65;cursor:wait}
+.inquiry-images .image-help,.inquiry-images .image-status{font-size:12px;line-height:1.75;margin-top:8px}
+.image-status:empty{display:none}
+.image-status[data-state=count],.image-status[data-state=type],.image-status[data-state=size],.image-status[data-state=total]{color:#f3ada0}
+.image-previews{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;list-style:none;padding:0;margin:14px 0 0}
+.image-previews li{min-width:0;margin:0;border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--field)}
+.image-previews img{width:100%;height:88px;object-fit:cover}
+.image-name{display:block;padding:8px 8px 0;font-size:11px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.image-previews button{width:100%;min-height:44px;padding:8px;border:0;background:transparent;color:var(--gold-dark);font-size:12px}
 .option-symbol .contact-app-icon{width:21px;height:21px}
 .contact-app-icon--line,.contact-app-icon--whatsapp,.contact-app-icon--facebook{color:var(--gold)}
 

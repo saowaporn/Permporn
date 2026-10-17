@@ -2,7 +2,7 @@
 const http=require('node:http');
 const fs=require('node:fs/promises');
 const path=require('node:path');
-const {handleInquiry}=require('./inquiry.cjs');
+const {handleInquiry,MAX_BODY}=require('./inquiry.cjs');
 const root=path.resolve(__dirname,'..','dist');
 const mock=process.argv.includes('--mock-mail');
 const port=Number(process.env.PORT||(mock?4174:3000));
@@ -11,7 +11,7 @@ http.createServer(async(req,res)=>{
   const url=new URL(req.url,`http://127.0.0.1:${port}`);
   if(url.pathname==='/api/inquiry'){
     const chunks=[];let length=0;
-    for await(const chunk of req){length+=chunk.length;if(length>16384){res.writeHead(413,{'Content-Type':'application/json'});res.end(JSON.stringify({success:false,code:'REQUEST_TOO_LARGE'}));return;}chunks.push(chunk);}
+    for await(const chunk of req){length+=chunk.length;if(length>MAX_BODY){res.writeHead(413,{'Content-Type':'application/json'});res.end(JSON.stringify({success:false,code:'REQUEST_TOO_LARGE'}));return;}chunks.push(chunk);}
     const method=req.method||'GET';
     const request=new Request(url,{method,headers:req.headers,...(!['GET','HEAD'].includes(method)?{body:Buffer.concat(chunks)}:{})});
     const options=mock?{env:{GOOGLE_MAIL_USER:'contact@permporn-accessories.com',GOOGLE_APP_PASSWORD:'local-test-only',CONTACT_ALLOWED_ORIGINS:`http://127.0.0.1:${port}`},ip:'local-test',createTransport:()=>({sendMail:async mail=>{

@@ -66,6 +66,82 @@
   };
   budget.addEventListener('input',e=>{if(!e.isComposing)formatBudget();});
   budget.addEventListener('compositionend',()=>{formatBudget();budget.dispatchEvent(new Event('input',{bubbles:true}));});
+  const imageInput=$('#reference-images');
+  const images=[];
+  let preparingImages=false,imageState='';
+  const imageMessages={
+    preparing:()=>text('กำลังเตรียมรูปภาพ…','Preparing images…'),
+    count:()=>text('แนบได้สูงสุด 3 รูป กรุณาลบรูปเดิมก่อนเพิ่มรูปใหม่','You can attach up to 3 images. Remove an image before adding another.'),
+    type:()=>text('กรุณาเลือกรูป JPG, PNG หรือ WebP ที่เปิดดูได้','Please choose a readable JPG, PNG or WebP image.'),
+    size:()=>text('กรุณาเลือกรูปต้นฉบับขนาดไม่เกิน 20 MB ต่อรูป','Please choose original images no larger than 20 MB each.'),
+    total:()=>text('รูปที่แนบต้องมีขนาดรวมไม่เกิน 2 MB กรุณาเลือกรูปที่เล็กลง','Attached images must total 2 MB or less. Please choose smaller images.')
+  };
+  const renderImages=()=>{
+    const list=$('#image-previews');
+    list.replaceChildren();list.hidden=!images.length;
+    images.forEach((image,index)=>{
+      const item=document.createElement('li');
+      const preview=document.createElement('img');preview.src=image.preview;preview.alt=image.name;
+      const name=document.createElement('span');name.className='image-name';name.textContent=image.name;
+      const remove=document.createElement('button');remove.type='button';remove.textContent=text('ลบรูป','Remove');
+      remove.setAttribute('aria-label',text('ลบรูป ','Remove ')+image.name);remove.disabled=preparingImages||busy;
+      remove.addEventListener('click',()=>{
+        images.splice(index,1);imageState='';state='';renderStatus();renderImages();
+        const next=list.querySelectorAll('button')[Math.min(index,images.length-1)];
+        (next||imageInput).focus({preventScroll:true});
+      });
+      item.append(preview,name,remove);list.append(item);
+    });
+    const status=$('#image-status');
+    status.textContent=imageMessages[imageState]?.()||(images.length?text(`แนบแล้ว ${images.length}/3 รูป`,`Attached ${images.length}/3 images`):'');
+    status.dataset.state=imageState;
+    imageInput.disabled=preparingImages||busy;
+    $('#send-inquiry').disabled=preparingImages||busy;
+    $('#share-image-note').hidden=!images.length;
+  };
+  const readImage=file=>new Promise((resolve,reject)=>{
+    const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('type'));reader.readAsDataURL(file);
+  });
+  const prepareImage=async file=>{
+    if(!['image/jpeg','image/png','image/webp'].includes(file.type))throw new Error('type');
+    if(!file.size||file.size>20*1024*1024)throw new Error('size');
+    let preview=await readImage(file);
+    const decoded=await new Promise((resolve,reject)=>{
+      const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(new Error('type'));image.src=preview;
+    });
+    if(!decoded.naturalWidth||!decoded.naturalHeight||decoded.naturalWidth*decoded.naturalHeight>40000000)throw new Error('size');
+    let blob=file;
+    if(file.size>600*1024||Math.max(decoded.naturalWidth,decoded.naturalHeight)>1600){
+      const canvas=document.createElement('canvas');
+      for(const longest of [1600,1280,1024]){
+        const scale=Math.min(1,longest/Math.max(decoded.naturalWidth,decoded.naturalHeight));
+        canvas.width=Math.max(1,Math.round(decoded.naturalWidth*scale));canvas.height=Math.max(1,Math.round(decoded.naturalHeight*scale));
+        const context=canvas.getContext('2d');if(!context)throw new Error('type');
+        context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(decoded,0,0,canvas.width,canvas.height);
+        blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',0.82));
+        if(!blob)throw new Error('type');
+        if(blob.size<=600*1024)break;
+      }
+      preview=await readImage(blob);
+    }
+    if(blob.size>1024*1024)throw new Error('total');
+    const extension=blob.type==='image/jpeg'?'jpg':blob.type==='image/png'?'png':'webp';
+    const stem=file.name.replace(/\.[^.]*$/,'').slice(0,100)||'reference';
+    return {name:stem+'.'+extension,contentType:blob.type,content:preview.slice(preview.indexOf(',')+1),preview,bytes:blob.size};
+  };
+  imageInput.addEventListener('change',async()=>{
+    const selected=[...imageInput.files];imageInput.value='';
+    if(!selected.length||preparingImages||busy)return;
+    if(images.length+selected.length>3){imageState='count';renderImages();return;}
+    preparingImages=true;imageState='preparing';state='';renderStatus();renderImages();
+    try{
+      const additions=[];
+      for(const file of selected)additions.push(await prepareImage(file));
+      if([...images,...additions].reduce((sum,image)=>sum+image.bytes,0)>2*1024*1024)throw new Error('total');
+      images.push(...additions);imageState='';
+    }catch(error){imageState=imageMessages[error.message]?error.message:'type';}
+    finally{preparingImages=false;renderImages();}
+  });
   const params=new URLSearchParams(location.search);
   // Only collection preferences are accepted from the URL, never personal information.
   ['category','item','gem','shape','size','metal'].forEach(name=>{
@@ -87,6 +163,7 @@
       const el=$('#'+name);
       if(!el.closest('.form-field').hidden)out[name]=el.value.trim();
     });
+    if(images.length)out.attachments=images.map(({name,contentType,content})=>({name,contentType,content}));
     return out;
   };
   const message=$('#inquiry-message');
@@ -116,10 +193,12 @@
   const renderStatus=()=>{
     const status=$('#form-status');
     const messages={
-      sending:text('กำลังส่งรายละเอียด…','Sending your enquiry…'),
+      sending:images.length?text('กำลังส่งรายละเอียดและรูปภาพ…','Sending your enquiry and images…'):text('กำลังส่งรายละเอียด…','Sending your enquiry…'),
       sent:text('ส่งคำขอแล้ว ทีมงานจะติดต่อกลับทางอีเมลที่คุณระบุ','Your enquiry has been sent. Our team will reply to the email you provided.'),
       rate:text('ส่งคำขอบ่อยเกินไป กรุณารอสักครู่ หรือเลือกส่งผ่านแอปอื่น','Too many requests. Please wait a little or choose another app.'),
       invalid:text('กรุณาตรวจสอบอีเมลและรายละเอียด แล้วลองอีกครั้ง','Please check your email and details, then try again.'),
+      images:text('รูปที่แนบส่งไม่ได้ กรุณาลบหรือเลือกรูป JPG, PNG หรือ WebP ใหม่ แล้วลองอีกครั้ง','The images could not be sent. Remove them or choose new JPG, PNG or WebP images, then try again.'),
+      large:text('ไฟล์ที่ส่งมีขนาดใหญ่เกินไป กรุณาลดจำนวนรูปแล้วลองอีกครั้ง','The upload is too large. Remove an image and try again.'),
       error:text('ยังส่งคำขอไม่ได้ ข้อมูลที่กรอกยังอยู่ครบ ลองอีกครั้งหรือเลือกส่งผ่านแอปอื่น','We could not send your enquiry. Your details are still here. Try again or choose another app.')
     };
     status.textContent=messages[state]||'';
@@ -131,7 +210,7 @@
   });
   form.addEventListener('input',()=>{if(!busy){state='';renderStatus();}syncMessage();});
   form.addEventListener('change',()=>{visibility();syncMessage();});
-  document.addEventListener('languagechange',()=>{syncMessage();renderStatus();renderCopy();});
+  document.addEventListener('languagechange',()=>{syncMessage();renderStatus();renderCopy();renderImages();});
   shareToggle.addEventListener('click',()=>{
     const opening=sharePanel.hidden;
     sharePanel.hidden=!opening;
@@ -156,27 +235,29 @@
   });
   form.addEventListener('submit',async e=>{
     e.preventDefault();
-    if(busy||!form.reportValidity())return;
+    if(busy||preparingImages||!form.reportValidity())return;
     const requestData=payload();
     busy=true;state='sending';renderStatus();
-    $('#send-inquiry').disabled=true;
+    renderImages();
     form.setAttribute('aria-busy','true');
     const controller=new AbortController();
-    const timeout=setTimeout(()=>controller.abort(),28000);
+    const timeout=setTimeout(()=>controller.abort(),60000);
     try{
       const response=await fetch(form.action,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(requestData),signal:controller.signal});
-      const result=await response.json();
+      const result=await response.json().catch(()=>({}));
       if(response.ok&&result.success===true)state='sent';
       else if(response.status===429)state='rate';
+      else if(response.status===413)state='large';
+      else if(result.code==='INVALID_IMAGES')state='images';
       else if(response.status===400)state='invalid';
       else state='error';
     }catch(_){state='error';}
     finally{
       clearTimeout(timeout);busy=false;
-      $('#send-inquiry').disabled=false;
+      renderImages();
       form.setAttribute('aria-busy','false');
       renderStatus();$('#form-status').focus({preventScroll:true});
     }
   });
-  visibility();syncMessage();form.hidden=false;
+  visibility();syncMessage();renderImages();form.hidden=false;
 })();
