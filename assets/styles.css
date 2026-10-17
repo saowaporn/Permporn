@@ -228,16 +228,18 @@ input,select,textarea{min-width:0;max-width:100%}
 }
 
 @media(max-width:900px){
-  /* Give the photo a bounded row; no fixed blank spacer before the heading. */
-  .hero{--hero-image-height:min(clamp(160px,32vw,230px),30svh);display:block;min-height:0;align-items:initial}
-  .hero-photo{position:relative;inset:auto;display:block;width:100%;height:var(--hero-image-height);object-position:center 60%;z-index:0}
-  .hero-shade{inset:0 0 auto;height:var(--hero-image-height);background:linear-gradient(180deg,transparent 50%,#000);z-index:1;pointer-events:none}
-  .hero-content{position:relative;z-index:2;margin-top:-22px;padding-block:0 36px}
+  /* Let content set the height so tall phones do not gain empty space. */
+  .hero{display:flex;min-height:0;align-items:flex-start}
+  .hero-photo{position:absolute;inset:0;display:block;width:100%;height:100%;object-position:70% center;z-index:0}
+  .hero-shade{inset:0;height:100%;background:linear-gradient(90deg,#000c,#0005),linear-gradient(0deg,#000b,transparent 70%);z-index:1;pointer-events:none}
+  .hero-content{position:relative;z-index:2;margin-top:0;padding-block:32px}
   .hero-brand{font-size:13px;line-height:1.6;margin-bottom:12px}
   .hero h1{font-size:clamp(30px,5.5vw + 8px,42px);line-height:1.4;max-width:700px}
   .hero-copy{font-size:15px;line-height:1.85;max-width:620px;white-space:normal;margin-top:16px}
   .hero .actions{margin-top:22px;gap:10px}
   .hero .button{min-height:48px;padding:12px 18px;font-size:13px}
+  body[data-page=index] #collections{padding-top:28px}
+  body[data-page=index] #collections .section-heading{margin-bottom:24px}
   .story-grid,.split-content,.category-hero,.faq-preview,.custom-panel,.order-layout{grid-template-columns:1fr;gap:30px}
   .story-grid .concept-image{max-height:370px}
   .story-grid .concept-image img{aspect-ratio:1.5}
@@ -321,8 +323,7 @@ input,select,textarea{min-width:0;max-width:100%}
 }
 
 @media(max-width:420px){
-  .hero{--hero-image-height:140px}
-  .hero-content{margin-top:-18px;padding-bottom:30px}
+  .hero-content{padding-block:28px}
   .hero h1{font-size:30px}
   .hero-copy{font-size:14px}
   .hero .actions,.cta-inner .actions{display:grid;grid-template-columns:1fr;width:100%}
@@ -433,10 +434,6 @@ body[data-page=faq] .lead-inner h1{font-size:clamp(30px,3.5vw,44px)}
   .shape-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media(max-width:900px){
-  .hero{--hero-image-height:clamp(190px,43vw,360px)}
-  .hero-photo{height:var(--hero-image-height);object-position:center 50%}
-  .hero-shade{height:var(--hero-image-height);background:linear-gradient(180deg,transparent 76%,#000)}
-  .hero-content{margin-top:0;padding-top:14px;padding-bottom:32px}
   .story-grid{gap:0}
   .story-grid .concept-image img{height:auto;aspect-ratio:3/2}
   .category-image img{aspect-ratio:3/2;max-height:none}
