@@ -1,10 +1,13 @@
 ﻿(() => {
   'use strict';
   const root = document.documentElement;
-  const lang = () => root.dataset.language || 'th';
+  const defaultLanguage = root.dataset.defaultLanguage || 'th';
+  const lang = () => root.dataset.language || defaultLanguage;
   const text = (th, en) => lang() === 'th' ? th : en;
   const $ = selector => document.querySelector(selector);
   const $$ = selector => [...document.querySelectorAll(selector)];
+  const languagePicker = $('.language-picker');
+  const languageSummary = languagePicker?.querySelector('summary');
   function applyLanguage(language) {
     root.lang = language; root.dataset.language = language;
     const key = language === 'th' ? 'Th' : 'En';
@@ -14,6 +17,8 @@
     $('meta[property="og:title"]').content = document.title;
     $('meta[property="og:description"]').content = description;
     $$('button[data-language]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.language === language)));
+    const selectedLanguage = $$('button[data-language]').find(b => b.dataset.language === language);
+    if (selectedLanguage && $('.language-current')) $('.language-current').textContent = selectedLanguage.dataset.languageName;
     $$('[data-text-th]').forEach(el => { el.textContent = el.dataset['text'+key]; });
     $$('[data-alt-th]').forEach(el => { el.alt = el.dataset['alt'+key]; });
     $$('[data-placeholder-th]').forEach(el => { el.placeholder = el.dataset['placeholder'+key]; });
@@ -23,6 +28,7 @@
   $$('button[data-language]').forEach(b => b.addEventListener('click', () => {
     try { localStorage.setItem('permporn-language', b.dataset.language); } catch (_) {}
     applyLanguage(b.dataset.language);
+    if(languagePicker){languagePicker.open=false;languageSummary.focus({preventScroll:true});}
   }));
   const announcement = $('.topline-slider');
   if (announcement) {
@@ -93,6 +99,7 @@
     nav.classList.remove('is-open');
     menu.setAttribute('aria-expanded','false');
     $$('.nav-dropdown[open]').forEach(d => d.open=false);
+    if(languagePicker)languagePicker.open=false;
   }
   menu.addEventListener('click', () => {
     const open = nav.classList.toggle('is-open');
@@ -101,6 +108,7 @@
   });
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
+    if(languagePicker?.open){languagePicker.open=false;languageSummary.focus();return;}
     const openDropdown = $('.nav-dropdown[open]');
     if (nav.classList.contains('is-open')) menu.focus();
     else if (openDropdown && openDropdown.contains(document.activeElement)) openDropdown.querySelector('summary').focus();
@@ -110,6 +118,7 @@
     if (e.relatedTarget && !d.contains(e.relatedTarget)) d.open=false;
   }));
   document.addEventListener('click', e => {
+    if(languagePicker&&!languagePicker.contains(e.target))languagePicker.open=false;
     if (!e.target.closest('.site-header')) closeMenu();
     $$('.nav-dropdown[open]').forEach(d => {if (!d.contains(e.target)) d.open=false;});
   });

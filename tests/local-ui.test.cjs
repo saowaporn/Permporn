@@ -4,9 +4,11 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {JSDOM}=require('jsdom');
 const root=path.resolve(__dirname,'..');
-function page(name,query='',dialogs=false){
+function page(name,query='',dialogs=false,savedLanguage){
   const dom=new JSDOM(fs.readFileSync(path.join(root,name+'.html'),'utf8'),{url:'http://localhost:4174/'+name+'.html'+query,runScripts:'outside-only'});
   const w=dom.window;
+  if(savedLanguage!==undefined)w.localStorage.setItem('permporn-language',savedLanguage);
+  w.eval(w.document.querySelector('head script:not([src])').textContent);
   // jsdom has no native modal implementation; model only its open/close lifecycle.
   if(dialogs){
     w.HTMLDialogElement.prototype.showModal=function(){this.open=true;};
@@ -19,6 +21,47 @@ function page(name,query='',dialogs=false){
   if(name==='contact')w.eval(fs.readFileSync(path.join(root,'assets/inquiry-form.js'),'utf8'));
   return dom;
 }
+
+test('Thai is the default regardless of browser language; explicit visitor preferences are remembered',()=>{
+  for(const savedLanguage of [undefined,'unsupported','en']){
+    const dom=page('index','',false,savedLanguage),d=dom.window.document;
+    try{
+      const expected=savedLanguage==='en'?'en':'th';
+      assert.equal(d.documentElement.dataset.defaultLanguage,'th');
+      assert.equal(d.documentElement.lang,expected);
+      assert.equal(d.documentElement.dataset.language,expected);
+      assert.equal(d.querySelector('.language-current').textContent,expected==='th'?'ไทย':'English');
+      assert.equal(d.querySelector('button[data-language="'+expected+'"]').getAttribute('aria-pressed'),'true');
+    }finally{dom.window.close();}
+  }
+});
+
+test('language picker updates its label, remembers selection, and closes before the mobile menu',()=>{
+  const dom=page('index'),w=dom.window,d=w.document;
+  try{
+    const picker=d.querySelector('.language-picker'),summary=picker.querySelector('summary');
+    const nav=d.querySelector('#main-nav');
+    assert.equal(d.querySelector('.language-current').textContent,'ไทย');
+    d.querySelector('.menu-button').click();picker.open=true;
+    d.querySelector('[data-language=en]').click();
+    assert.equal(d.documentElement.lang,'en');
+    assert.equal(d.querySelector('.language-current').textContent,'English');
+    assert.equal(w.localStorage.getItem('permporn-language'),'en');
+    assert.equal(picker.open,false);
+    assert.equal(d.activeElement,summary);
+    assert.equal(nav.classList.contains('is-open'),true);
+    assert.equal(d.querySelector('button[data-language=en]').getAttribute('aria-pressed'),'true');
+    assert.equal(summary.getAttribute('aria-label'),'Choose language');
+    picker.open=true;
+    summary.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
+    assert.equal(picker.open,false);
+    assert.equal(nav.classList.contains('is-open'),true);
+    picker.open=true;d.querySelector('[data-language=th]').click();
+    assert.equal(d.querySelector('.language-current').textContent,'ไทย');
+    assert.equal(w.localStorage.getItem('permporn-language'),'th');
+    picker.open=true;d.querySelector('main h1').click();assert.equal(picker.open,false);
+  }finally{w.close();}
+});
 
 test('enquiry information opens without consent, preserves the form, and accepts explicitly',()=>{
   const dom=page('contact','',true),w=dom.window,d=w.document;
