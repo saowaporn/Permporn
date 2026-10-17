@@ -12,44 +12,32 @@ function page(name,query=''){
   w.fetch=()=>{throw new Error('UI tests must not send requests');};
   w.eval(fs.readFileSync(path.join(root,'assets/site.js'),'utf8'));
   if(name==='contact')w.eval(fs.readFileSync(path.join(root,'assets/inquiry-form.js'),'utf8'));
-  w.eval(fs.readFileSync(path.join(root,'assets/select-controls.js'),'utf8'));
   return dom;
 }
-test('custom select updates the original field, inquiry summary, and shareable message',()=>{
+test('native collection select updates visible fields and shareable message',()=>{
   const dom=page('contact'),w=dom.window,d=w.document;
   try{
-    d.querySelector('#category-trigger').click();
-    assert.equal(d.querySelector('#category-listbox').hidden,false);
-    d.querySelector('#category-option-2').click();
-    assert.equal(d.querySelector('#category').value,'colored-gemstones');
-    assert.equal(d.querySelector('#category-listbox').hidden,true);
+    d.querySelector('#category').value='colored-gemstones';
+    d.querySelector('#category').dispatchEvent(new w.Event('change',{bubbles:true}));
     assert.equal(d.querySelector('#gem').closest('.form-field').hidden,false);
     d.querySelector('#toggle-inquiry-share').click();
     assert.match(d.querySelector('#inquiry-message').value,/พลอยสี/);
     assert.equal(new w.FormData(d.querySelector('form')).get('category'),'colored-gemstones');
   }finally{w.close();}
 });
-test('combobox supports keyboard selection, Escape, outside click, and language changes',()=>{
+test('shape links prefill native fields and changing language preserves carat selection',()=>{
   const dom=page('contact','?category=lab-grown-diamonds&shape=Oval#inquiry'),w=dom.window,d=w.document;
   try{
     assert.equal(d.querySelector('#category').value,'lab-grown-diamonds');
     assert.equal(d.querySelector('#shape').value,'Oval');
-    const trigger=d.querySelector('#size-trigger');
-    trigger.dispatchEvent(new w.KeyboardEvent('keydown',{key:'ArrowDown',bubbles:true}));
-    trigger.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Enter',bubbles:true}));
-    assert.equal(d.querySelector('#size').value,'0.30 ct');
+    const size=d.querySelector('#size');size.value='0.30 ct';
+    size.dispatchEvent(new w.Event('change',{bubbles:true}));
     assert.equal(new w.FormData(d.querySelector('form')).get('size'),'0.30 ct');
     d.querySelector('#toggle-inquiry-share').click();
     assert.match(d.querySelector('#inquiry-message').value,/0.30 ct/);
-    trigger.click();trigger.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));
-    assert.equal(trigger.getAttribute('aria-expanded'),'false');
-    trigger.click();d.body.dispatchEvent(new w.Event('pointerdown',{bubbles:true}));
-    assert.equal(trigger.getAttribute('aria-expanded'),'false');
     d.querySelector('[data-language=en]').click();
-    assert.match(d.querySelector('#size-option-0').textContent,/Not sure/);
-    assert.equal(d.querySelector('#size').value,'0.30 ct');
-    d.querySelector('#size').value='';d.querySelector('#size').dispatchEvent(new w.Event('change',{bubbles:true}));
-    assert.match(trigger.textContent,/Not sure/);
+    assert.match(size.options[0].textContent,/Not sure/);
+    assert.equal(size.value,'0.30 ct');
   }finally{w.close();}
 });
 
@@ -86,29 +74,48 @@ test('FAQ categories, search, empty result, reset, and language remain usable',(
   }finally{w.close();}
 });
 
-test('pointer selection survives trigger blur before click for mouse and touch',()=>{
-  for(const pointerType of ['mouse','touch']){
-    const dom=page('contact'),w=dom.window,d=w.document;
-    try{
-      const trigger=d.querySelector('#size-trigger');
-      trigger.focus();trigger.click();
-      const option=d.querySelector('#size-option-4');
-      const down=new w.Event('pointerdown',{bubbles:true,cancelable:true});
-      Object.defineProperty(down,'pointerType',{value:pointerType});
-      option.dispatchEvent(down);
-      // Reproduce browser ordering: pointerdown, focusout, pointerup, click.
-      trigger.blur();
-      assert.equal(d.querySelector('#size-listbox').hidden,false);
-      option.dispatchEvent(new w.Event('pointerup',{bubbles:true}));
-      option.click();
-      assert.equal(d.querySelector('#size').value,'1.00 ct');
-      assert.equal(d.querySelector('#size-listbox').hidden,true);
-      assert.match(trigger.textContent,/1.00 ct/);
-      assert.equal(new w.FormData(d.querySelector('form')).get('size'),'1.00 ct');
-      assert.equal(d.querySelector('#size-help'),null);
-    }finally{w.close();}
-  }
+test('all select options stay editable and focusable without a custom popup',()=>{
+  const dom=page('contact'),w=dom.window,d=w.document;
+  try{
+    const category=d.querySelector('#category');category.value='custom-jewelry';
+    category.dispatchEvent(new w.Event('change',{bubbles:true}));
+    for(const select of d.querySelectorAll('select')){
+      assert.equal(select.disabled,false);assert.equal(select.tabIndex,0);
+      assert.equal(select.getAttribute('aria-hidden'),null);
+      assert.ok(d.querySelector('label[for="'+select.id+'"]'));
+      for(const option of select.options){
+        select.value=option.value;select.dispatchEvent(new w.Event('change',{bubbles:true}));
+        assert.equal(select.value,option.value);
+        assert.equal(new w.FormData(d.querySelector('form')).get(select.name),option.value);
+      }
+    }
+    for(const field of d.querySelectorAll('#name,#email,#budget,#date,#details')){
+      assert.equal(field.disabled,false);assert.equal(field.readOnly,false);
+    }
+    assert.equal(d.querySelector('.select-trigger,.select-native'),null);
+  }finally{w.close();}
 });
+
+test('edited enquiry fields reach the email endpoint together',async()=>{
+  const dom=page('contact'),w=dom.window,d=w.document;
+  try{
+    const expected={name:'Form test',email:'visitor@example.com',category:'custom-jewelry',item:'rings',gem:'spinel',shape:'Pear',size:'1.50 ct',metal:'18K',budget:'150,000',date:'2026-12-15',details:'Please advise on this design.'};
+    for(const [id,value] of Object.entries(expected)){
+      const field=d.getElementById(id);field.value=value;
+      field.dispatchEvent(new w.Event(field.tagName==='SELECT'?'change':'input',{bubbles:true}));
+    }
+    d.querySelector('#consent').checked=true;
+    let sent;
+    w.fetch=async(url,options)=>{assert.match(url,/\/api\/inquiry$/);sent=JSON.parse(options.body);return {ok:true,json:async()=>({success:true})};};
+    const form=d.querySelector('form');form.reportValidity=()=>true;
+    form.dispatchEvent(new w.Event('submit',{bubbles:true,cancelable:true}));
+    await new Promise(resolve=>setTimeout(resolve,0));
+    for(const [key,value] of Object.entries(expected))assert.equal(sent[key],value);
+    assert.equal(sent.consent,true);
+    assert.equal(d.querySelector('#form-status').dataset.state,'sent');
+  }finally{w.close();}
+});
+
 test('single-language diamond labels, gold line drawings, compact homepage, and all page initialization',()=>{
   const files=fs.readdirSync(root).filter(f=>f.endsWith('.html'));
   assert.equal(files.length,11);
@@ -118,7 +125,7 @@ test('single-language diamond labels, gold line drawings, compact homepage, and 
       assert.equal(d.querySelectorAll('.category-hero>.status,.category-hero>div>.status').length,0);
       assert.equal(d.querySelectorAll('.service-ribbon').length,0);
       assert.equal(d.querySelectorAll('.topline-message:not(.topline-clone)').length,4);
-      assert.equal(d.querySelectorAll('.select-trigger').length,d.querySelectorAll('select').length);
+      assert.equal(d.querySelectorAll('.select-trigger,.select-native').length,0);
       assert.ok(!/\?{4}/.test(d.body.textContent),file+' must preserve Thai text');
       if(file.includes('diamonds')){
         const shapes=d.querySelectorAll('.shape-option');assert.equal(shapes.length,9);

@@ -352,19 +352,7 @@ body[data-page=about] .values-grid article{border-top-color:#494132}
 .shape-option:hover .diamond-shape,.shape-option:hover strong{color:var(--gold)}
 .shape-option:active{background:transparent;border-color:var(--gold);color:var(--ivory);box-shadow:none}
 .shape-option:active .diamond-shape,.shape-option:active strong{color:var(--gold)}
-.select-control{position:relative;min-width:0;width:100%}
-.select-native{position:absolute!important;width:1px!important;height:1px!important;min-height:0!important;opacity:0;pointer-events:none;clip-path:inset(50%)}
-.select-trigger{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-width:0;min-height:48px;padding:11px 12px;border:1px solid #655e50;border-radius:2px;background:var(--field);color:var(--ink);text-align:left;font-size:14px;line-height:1.5}
-.select-trigger>span{min-width:0;overflow-wrap:anywhere}
-.select-trigger::after{content:'';width:7px;height:7px;border-right:1px solid var(--gold);border-bottom:1px solid var(--gold);transform:rotate(45deg);flex-shrink:0;margin:0 3px 4px}
-.select-trigger[aria-expanded=true]{border-color:var(--gold)}
-.select-trigger[aria-expanded=true]::after{transform:rotate(225deg);margin-block:4px 0}
-.select-menu{position:absolute;z-index:45;top:calc(100% + 5px);left:0;right:0;overflow-y:auto;overscroll-behavior:contain;max-height:280px;padding:5px;background:#141516;border:1px solid #8b753f;border-radius:3px;box-shadow:0 14px 32px #0009}
-.select-menu.opens-up{top:auto;bottom:calc(100% + 5px)}
-.select-option{padding:11px 12px;min-height:44px;color:var(--ink);font-size:14px;line-height:1.5;cursor:pointer;overflow-wrap:anywhere}
-.select-option[aria-selected=true]{box-shadow:inset 2px 0 var(--gold);color:#e6cd96}
-.select-option:hover,.select-option.is-highlighted{background:var(--gold);color:#17130b;box-shadow:none}
-.select-option[aria-disabled=true]{opacity:.45;cursor:default}
+.form-field select{cursor:pointer;appearance:auto;color-scheme:dark}
 /* FAQ: shared page width, aligned heading, and evenly sized category controls. */
 body[data-page=faq] .lead-inner{padding-block:30px 38px}
 body[data-page=faq] .lead-inner h1{font-size:clamp(30px,3.5vw,44px)}
@@ -409,7 +397,6 @@ body[data-page=faq] .lead-inner h1{font-size:clamp(30px,3.5vw,44px)}
   .category-image img{aspect-ratio:3/2;max-height:none}
 }
 @media(max-width:760px){
-  .select-trigger,.select-option{font-size:16px}
   .hero h1{font-size:clamp(29px,5.4vw + 8px,40px);line-height:1.45}
   .hero-copy{font-size:15px}
   .story-copy{padding:26px 22px}
