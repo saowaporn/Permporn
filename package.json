@@ -9,7 +9,7 @@
   "scripts": {
     "build": "node scripts/build-production.cjs",
     "start": "node server/local.cjs",
-    "test": "node tests/inquiry.test.cjs",
+    "test": "node --test tests/inquiry.test.cjs tests/thai-typography.test.cjs",
     "test:ui": "node tests/local-ui.test.cjs"
   },
   "dependencies": {

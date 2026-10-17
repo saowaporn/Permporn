@@ -136,6 +136,12 @@ html{scroll-padding-top:calc(var(--header-height) + 16px)}
 .menu-button{width:44px;height:44px}
 :where(.collection-grid,.story-grid,.split-content,.category-hero,.criteria-grid,.gemstone-grid,.values-grid,.agreement-grid,.order-layout,.contact-layout,.custom-panel,.footer-grid,.form-grid)>*{min-width:0}
 h1,h2,h3,p,li,.button{overflow-wrap:break-word}
+/* Thai follows word and phrase boundaries. Long addresses wrap separately. */
+html[data-language=th] :is(h1,h2,h3,p,li,label,summary,.button,.inline-link),.lang-th{word-break:normal;overflow-wrap:normal;line-break:auto;hyphens:none}
+html[data-language=th] :is(p,li,label,summary,.button){text-wrap:pretty}
+html[data-language=th] :is(h1,h2,h3){text-wrap:balance}
+.thai-word,.thai-phrase{white-space:nowrap}
+.text-address{white-space:normal;overflow-wrap:anywhere;word-break:normal}
 input,select,textarea{min-width:0;max-width:100%}
 .button{max-width:100%;text-align:center;white-space:normal}
 .actions{gap:12px}
