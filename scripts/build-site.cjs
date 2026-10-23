@@ -56,14 +56,17 @@ const footerContactIcons = {
   "email": "<svg class=\"contact-app-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"></rect><path d=\"m3 7 9 6 9-6\"></path></svg>"
 };
 function footerContacts(){
-  return [
-    ['line',line,'LINE Official',true],
-    ['whatsapp',wa,'WhatsApp',true],
-    ['phone','tel:+66836870818','083-687-0818',false],
-    ['facebook','https://www.facebook.com/permpornaccessories/','Facebook',true],
-    ['instagram',instagram,'Instagram',true],
-    ['email','mailto:contact@permporn-accessories.com','contact@permporn-accessories.com',false]
-  ].map(([name,href,label,newTab])=>`<a class="footer-contact-link footer-${name}" href="${href}" ${newTab?external:''}>${footerContactIcons[name]}<span>${label}</span></a>`).join('');
+  const socials=[
+    ['line',line,'LINE Official'],
+    ['whatsapp',wa,'WhatsApp'],
+    ['facebook','https://www.facebook.com/permpornaccessories/','Facebook'],
+    ['instagram',instagram,'Instagram']
+  ].map(([name,href,label])=>`<a class="footer-social-link footer-${name}" href="${href}" ${external} aria-label="${label}" title="${label}">${footerContactIcons[name]}</a>`).join('');
+  const details=[
+    ['phone','tel:+66836870818','083-687-0818'],
+    ['email','mailto:contact@permporn-accessories.com','contact@permporn-accessories.com']
+  ].map(([name,href,label])=>`<a class="footer-contact-link footer-${name}" href="${href}">${footerContactIcons[name]}<span>${label}</span></a>`).join('');
+  return `<div class="footer-socials">${socials}</div>${details}`;
 }
 function footer() {
   return `<footer class="site-footer"><div class="container footer-grid"><div class="footer-intro"><a class="brand" href="index.html"><img src="assets/permporn-logo-mark.png" alt="" width="55" height="55"><span class="wordmark">PERMPORN<span>ACCESSORIES</span></span></a><p>${t('เพชร พลอยสี และเครื่องประดับสั่งทำ\nคัดสรรตามความต้องการของคุณ','Diamonds, gemstones, and custom jewelry,\nthoughtfully sourced around you.')}</p></div><div><h2>${t('สินค้าและงานสั่งทำ','Collections')}</h2>${data.collections.map(c=>link(c.id,c.name)).join('')}</div><div><h2>${t('ข้อมูลและบริการ','Information')}</h2>${navItems.map(([key,names])=>link(key,names)).join('')}${link('contact',['ติดต่อและนัดหมาย','Contact & appointment'])}</div><div class="footer-contact"><h2>${t('พูดคุยกับเรา','Talk to us')}</h2>${footerContacts()}</div></div><div class="container footer-bottom"><p>© <span id="year">2026</span> PERMPORN ACCESSORIES</p></div></footer>
