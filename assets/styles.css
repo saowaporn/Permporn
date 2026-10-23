@@ -182,7 +182,7 @@ input,select,textarea{min-width:0;max-width:100%}
 .order-layout{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:clamp(32px,5vw,80px)}
 .order-sidebar{top:calc(var(--header-height) + 24px)}
 .contact-layout{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(30px,4.5vw,70px)}
-.contact-options{max-height:calc(100dvh - var(--header-height) - 120px);overflow-y:auto;overscroll-behavior:contain}
+.contact-options{max-height:calc(100dvh - var(--header-height) - var(--announcement-height) - 120px);overflow-y:auto;overscroll-behavior:contain}
 .inquiry-card{scroll-margin-top:16px}
 .inquiry-share{scroll-margin-top:80px;scroll-margin-bottom:24px}
 .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -378,7 +378,7 @@ input,select,textarea{min-width:0;max-width:100%}
 .image-name{display:block;padding:8px 8px 0;font-size:11px;line-height:1.5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .image-previews button{width:100%;min-height:44px;padding:8px;border:0;background:transparent;color:var(--gold-dark);font-size:12px}
 .option-symbol .contact-app-icon{width:21px;height:21px}
-.contact-app-icon--line,.contact-app-icon--whatsapp,.contact-app-icon--facebook{color:var(--gold)}
+.contact-app-icon--line,.contact-app-icon--whatsapp,.contact-app-icon--facebook,.contact-app-icon--instagram{color:var(--gold)}
 
 /* Enquiry information: scroll the text while keeping the consent control visible. */
 html.privacy-dialog-open{overflow:hidden}
@@ -475,7 +475,7 @@ body[data-page=faq] .lead-inner h1{font-size:clamp(30px,3.5vw,44px)}
 @media(max-width:600px){
   .floating-contact{width:48px;height:48px;min-height:48px;padding:0;justify-content:center;right:12px;bottom:max(12px,env(safe-area-inset-bottom))}
   .floating-contact>span{display:none}
-  .contact-options{bottom:72px;max-height:calc(100dvh - 100px)}
+  .contact-options{bottom:72px;max-height:calc(100dvh - var(--header-height) - var(--announcement-height) - 96px)}
 }
 @media(max-width:360px){
   .shape-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
