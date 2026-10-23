@@ -158,7 +158,6 @@
     });
     contactOptions.querySelectorAll('.contact-option').forEach(a=>a.addEventListener('click',()=>setTimeout(()=>closeContact(),0)));
   }
-  $('#year').textContent = new Date().getFullYear();
   const tabs = $$('[data-tab]');
   if(tabs.length) {
     function selectTab(tab, focus=false) {
